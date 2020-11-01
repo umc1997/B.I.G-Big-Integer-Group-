@@ -1,5 +1,4 @@
 //memory leak detecter 
-//test
 #include <vld.h> 
 #include <stdio.h>
 #include "CoreOperation.h"
@@ -15,7 +14,6 @@ int main()
 	bigint* b = NULL;
 	bigint* mul = NULL;
 
-	
 	//one number is 0
 	printf("Test 1\n");
 	big_set_zero(&a);

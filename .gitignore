@@ -1,6 +1,6 @@
 
-# Created by https://www.toptal.com/developers/gitignore/api/windows,visualstudio,c
-# Edit at https://www.toptal.com/developers/gitignore?templates=windows,visualstudio,c
+# Created by https://www.toptal.com/developers/gitignore/api/visualstudio,c,windows
+# Edit at https://www.toptal.com/developers/gitignore?templates=visualstudio,c,windows
 
 ### C ###
 # Prerequisites
@@ -433,4 +433,4 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 
-# End of https://www.toptal.com/developers/gitignore/api/windows,visualstudio,c
+# End of https://www.toptal.com/developers/gitignore/api/visualstudio,c,windows
