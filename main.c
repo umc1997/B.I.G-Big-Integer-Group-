@@ -8,7 +8,7 @@ void showProcessHex(bigint* a, bigint* b, bigint* c, char op);
 void showBigint(bigint* a, int needBracket);
 int main()
 {
-	
+
 	srand((unsigned)time(NULL));
 	bigint* a = NULL;
 	bigint* b = NULL;
