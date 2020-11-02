@@ -91,7 +91,7 @@ ErrorMessage big_word_reduction(bigint** dst, bigint* src, int count);
 ErrorMessage big_addition(bigint** z, bigint* x, bigint* y);
 // add x and y ignore sign, assign to z (input:x > 0, y > 0, z != x ,z != y) 
 ErrorMessage big_additionAbs(bigint** z, bigint* x, bigint* y);
-
+// additionConst 
 
 // substraction z = x - y
 // substract y from x, assign to z
@@ -110,5 +110,9 @@ ErrorMessage big_multiplicationKaratsuba(bigint** z, bigint* x, bigint* y);
 ErrorMessage big_multiplicationSchoolBook(bigint** z, bigint* x, bigint* y);
 // multiply bigint x and const int y, assign to z ( y range = int range )
 ErrorMessage big_multiplicationConst(bigint** z, bigint* x, const int y);
+
+//squaring z = x * x
+
+//division x = y * q + r (0 <= r < y)
 
 #endif

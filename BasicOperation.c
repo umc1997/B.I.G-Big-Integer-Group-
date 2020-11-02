@@ -91,3 +91,28 @@ ErrorMessage wordMultiplication(word* C1, word* C0, word A, word B)
 
 	return SUCCESS;
 }
+
+ErrorMessage wordSquaring(word* C1, word* C0, word A)
+{
+	word A1, A0, T0, T1, T;
+	unsigned int shiftUnit = WORD_UNIT >> 1;
+	A1 = A >> shiftUnit;
+	A0 = A - (A1 << shiftUnit);
+
+	// A * A = A1^2 * W + 2A0A1 * W^(1/2) + A0^2
+	// W^(1/2) part : 2A0A1
+	T = A0 * A1;
+
+	T1 = T >> (shiftUnit - 1);
+	T0 = T << (shiftUnit + 1);
+
+	// W and 1 part : A1^2 and A0^2
+	*C0 = A0 * A0;
+	*C1 = A1 * A1;
+
+	//final
+	*C0 = *C0 + T0;
+	*C1 = *C1 + T1 + ((*C0) < T0);
+
+	return SUCCESS;
+}
