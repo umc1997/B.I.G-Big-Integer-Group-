@@ -69,7 +69,7 @@ ErrorMessage big_flip_sign(bigint** x);
 // compare two big int
 int big_compare(bigint* x, bigint* y);
 // compare two big int ignore sign
-int big_compareAbs(bigint* x, bigint* y);
+int big_compareABS(bigint* x, bigint* y);
 
 // shift & reduction operation
 // operating src and save it to dst
@@ -90,28 +90,36 @@ ErrorMessage big_word_reduction(bigint** dst, bigint* src, int count);
 // add x and y, assign to z
 ErrorMessage big_addition(bigint** z, bigint* x, bigint* y);
 // add x and y ignore sign, assign to z (input:x > 0, y > 0, z != x ,z != y) 
-ErrorMessage big_additionAbs(bigint** z, bigint* x, bigint* y);
+ErrorMessage big_additionABS(bigint** z, bigint* x, bigint* y);
 // additionConst 
 
 // substraction z = x - y
 // substract y from x, assign to z
 ErrorMessage big_substraction(bigint** z, bigint* x, bigint* y);
 // substract y from x ignore sign, assign to z  (input: x > 0 ,y > 0, x > y, z != x ,z != y)
-ErrorMessage big_substractionAbs(bigint** z, bigint* x, bigint* y);
+ErrorMessage big_substractionABS(bigint** z, bigint* x, bigint* y);
 
 // multiplication z = x * y
 // multiply x and y , assign to z
 ErrorMessage big_multiplication(bigint** z, bigint* x, bigint* y);
 // multiply x and y , assign to z  (input: x > 0, y > 0) 
-ErrorMessage big_multiplicationAbs(bigint** z, bigint* x, bigint* y);
-// multiply x and y ignore sign, assign to z using karatsuba algorithm (use for wordlen(x) or wordlen(y) > karaFlag) (z != x ,z != y) 
-ErrorMessage big_multiplicationKaratsuba(bigint** z, bigint* x, bigint* y);
-// multiply x and y ignore sign, assign to z (using schoolbook algorithm) (use for wordlen(x) or wordlen(y) <= karaFlag)  (z != x ,z != y)
+ErrorMessage big_multiplicationABS(bigint** z, bigint* x, bigint* y);
+// multiply x and y ignore sign, assign to z (using schoolbook algorithm) (use for wordlen(x) or wordlen(y) <= karaFlag) 
 ErrorMessage big_multiplicationSchoolBook(bigint** z, bigint* x, bigint* y);
+// multiply x and y ignore sign, assign to z using karatsuba algorithm (use for wordlen(x) or wordlen(y) > karaFlag) 
+ErrorMessage big_multiplicationKaratsuba(bigint** z, bigint* x, bigint* y);
 // multiply bigint x and const int y, assign to z ( y range = int range )
 ErrorMessage big_multiplicationConst(bigint** z, bigint* x, const int y);
 
 //squaring z = x * x
+// square x , assign to z
+ErrorMessage big_squaring(bigint** z, bigint* x);
+// square x (x > 0) , assign to z (x != z)
+ErrorMessage big_squaringABS(bigint** z, bigint* x);
+// square x , assign to z (using schoolbook algorithm) (use for wordlen(x) or wordlen(y) <= karaFlag) 
+ErrorMessage big_squaringSchoolBook(bigint** z, bigint* x);
+// square x , assign to z using karatsuba algorithm (use for wordlen(x) or wordlen(y) > karaFlag) 
+ErrorMessage big_squaringKaratsuba(bigint** z, bigint* x);
 
 //division x = y * q + r (0 <= r < y)
 

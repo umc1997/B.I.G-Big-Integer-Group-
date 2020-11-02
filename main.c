@@ -14,13 +14,21 @@ int main()
 	bigint* b = NULL;
 	bigint* mul = NULL;
 
-	for (int i = 0; i <= 100; i++)
+	//big_set_by_string(&a, NON_NEGATIVE, "6c51f99580b09439deae", 16);
+	//big_set_by_string(&b, NON_NEGATIVE, "42526518a0aca56a94a4", 16);
+
+	//big_multiplication(&mul, a, b);
+	//showProcessHex(a, b, mul, '*');
+	for (int i = 0; i < 100; i++)
 	{
-		word C0 = 0, C1 = 0, A = i;
-		wordSquaring(&C1, &C0, A);
-		printf("%d ", C1 * 256 + C0);
+		big_gen_rand(&a, NON_NEGATIVE, 10);
+		big_gen_rand(&b, NON_NEGATIVE, 10);
+
+		
+		big_multiplication(&mul, a, b);
+
+		showProcessHex(a, b, mul, '*');
 	}
-	
 	big_delete(&a);
 	big_delete(&b);
 	big_delete(&mul);
@@ -38,13 +46,18 @@ void showProcessDec(bigint* a, bigint* b, bigint* c, char op)
 }
 void showProcessHex(bigint* a, bigint* b, bigint* c, char op)
 {
-	printf("a: ");
+	printf("a = ");
 	big_show_hex(a);
-	printf("b: ");
-	big_show_hex(b);
-	printf("a %c b = ", op);
-	big_show_hex(c);
 	printf("\n");
+	printf("b = ");
+	big_show_hex(b);
+	printf("\n");
+	printf("if a %c b == ", op);
+	big_show_hex(c);
+	printf(":\n\t");
+	printf("print(1)\n");
+	printf("else:\n\t");
+	printf("print(hex(a*b))\n");
 }
 void showBigint(bigint* a, int needBracket)
 {
