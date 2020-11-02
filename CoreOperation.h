@@ -111,7 +111,7 @@ ErrorMessage big_multiplicationKaratsuba(bigint** z, bigint* x, bigint* y);
 // multiply bigint x and const int y, assign to z ( y range = int range )
 ErrorMessage big_multiplicationConst(bigint** z, bigint* x, const int y);
 
-//squaring z = x * x
+// squaring z = x * x
 // square x , assign to z
 ErrorMessage big_squaring(bigint** z, bigint* x);
 // square x (x > 0) , assign to z (x != z)
@@ -121,6 +121,8 @@ ErrorMessage big_squaringSchoolBook(bigint** z, bigint* x);
 // square x , assign to z using karatsuba algorithm (use for wordlen(x) or wordlen(y) > karaFlag) 
 ErrorMessage big_squaringKaratsuba(bigint** z, bigint* x);
 
-//division x = y * q + r (0 <= r < y)
+// division x = y * q + r (0 <= r < y)
+// divide x with y , calculate q and r ( 0 <= r < y) , assign to q and r (input: y > 0)
+ErrorMessage big_division(bigint** q, bigint** r, bigint* x, bigint* y);
 
 #endif

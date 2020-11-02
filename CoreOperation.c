@@ -892,6 +892,10 @@ ErrorMessage big_multiplication(bigint** z, bigint* x, bigint* y)
 		big_assign(&tmp, x);
 		big_flip_sign(&tmp);
 	}
+	else if (big_compare(x, y) == EQUAL)
+	{
+		big_squaring(&tmp, x);
+	}
 	else
 	{	
 		// tmp = |x| * |y|
@@ -977,8 +981,6 @@ ErrorMessage big_multiplicationSchoolBook(bigint** z, bigint* x, bigint* y)
 			// T = (Aj * Bi) << w(i+j)
 			bigint* T = NULL;
 			big_new(&T, NON_NEGATIVE, i + j + 2);
-			for (int k = 0; k < i + j + 2; k++)
-				T->a[k] = 0;
 			word A = 0, B = 0;
 			wordMultiplication(&A, &B, xWords[i], yWords[j]);
 			T->a[i + j + 1] = A;
@@ -1032,7 +1034,6 @@ ErrorMessage big_multiplicationKaratsuba(bigint** z, bigint* x, bigint* y)
 		big_multiplicationKaratsuba(&T0, A0, B0);
 
 		// R = T1 << 2l + T0
-
 		big_new(&R, NON_NEGATIVE, T1->wordlen + 2 * l);
 		for (int i = 0; i < T1->wordlen + 2 * l; i++)
 		{
@@ -1182,25 +1183,107 @@ ErrorMessage big_squaringSchoolBook(bigint** z, bigint* x)
 	int xWordlen = x->wordlen;
 
 	// alloc
-	bigint* tmp = NULL;
 	bigint* C1 = NULL;
 	bigint* C2 = NULL;
-	bigint* T1 = NULL;
-	bigint* T2 = NULL;
 
-	big_set_zero(&tmp);
-
+	big_new(&C1, NON_NEGATIVE, 2 * xWordlen);
+	big_set_zero(&C2);
 	// mul and add
 	for (int i = 0; i < xWordlen; i++)
 	{
+		// C1 = A^2 || A^2 || A^2 || A^2 || A^2 ...
+		word A0 = 0, A1 = 0;
+		wordSquaring(&A1, &A0, xWords[i]);
+		
+		C1->a[i * 2] = A0;
+		C1->a[i * 2 + 1] = A1;
+		for (int j = i + 1; j < xWordlen; j++)
+		{
+			// C2 = (AiAj) << w(i+j)
+			bigint* T = NULL;
+			big_new(&T, NON_NEGATIVE, i + j + 2);
+			word A = 0, B = 0;
+			wordMultiplication(&A, &B, xWords[i], xWords[j]);
+			T->a[i + j + 1] = A;
+			T->a[i + j] = B;
 
+			// tmp = tmp + T
+			big_additionABS(&C2, C2, T);
+			big_delete(&T);
+		}
 	}
-	big_assign(z, tmp);
-	big_delete(&tmp);
+	big_bit_left_shift(&C2, C2, 1);
+	big_refine(C1);
+	big_refine(C2);
+	big_addition(z, C1, C2);
+	big_delete(&C1);
+	big_delete(&C2);
 	return SUCCESS;
 }
-
 ErrorMessage big_squaringKaratsuba(bigint** z, bigint* x)
 {
+	if (x == NULL)
+		return FAIL_NULL;
+	int xWordlen = x->wordlen;
+	if (xWordlen <= karaFlag)
+	{
+		big_squaringSchoolBook(z, x);
+	}
+	else
+	{
+		// calculate shift bit
+		unsigned int l = xWordlen >> 1;
 
+		//alloc
+		bigint* A1 = NULL;
+		bigint* A0 = NULL;
+		bigint* T1 = NULL;
+		bigint* T0 = NULL;
+		bigint* R = NULL;
+		bigint* S = NULL;
+
+		// A1, A0
+		big_word_right_shift(&A1, x, l);
+		big_word_reduction(&A0, x, l);
+
+		// T1, T0
+		big_squaringKaratsuba(&T1, A1);
+		big_squaringKaratsuba(&T0, A0);
+
+		// R = T1 << 2l + T0
+		big_new(&R, NON_NEGATIVE, T1->wordlen + 2 * l);
+		for (int i = 0; i < T1->wordlen + 2 * l; i++)
+		{
+			if (i < 2 * l)
+			{
+				if (T0->wordlen > i)
+					R->a[i] = T0->a[i];
+			}
+			else
+			{
+				R->a[i] = T1->a[i - 2 * l];
+			}
+		}
+		big_refine(R);
+
+		// S = (A1 * A0) << (lw + 1)
+		big_multiplicationKaratsuba(&S, A1, A0);
+		big_word_left_shift(&S, S, l);
+		big_bit_left_shift(&S, S, 1);
+
+		// R = R + S
+		big_addition(&R, R, S);
+		
+		//assign
+		big_assign(z, R);
+
+		//delete
+		big_delete(&A1);
+		big_delete(&A0);
+		big_delete(&T1);
+		big_delete(&T0);
+		big_delete(&S);
+		big_delete(&R);
+	}
+	return SUCCESS;
 }
