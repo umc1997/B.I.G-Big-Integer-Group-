@@ -19,6 +19,8 @@ unsigned int hex2int(char c);
 int IsValidChar(char c, int base);
 //single precision multiplication : A * B = C1 * W + C0  (0 <= A,B,C0,C1 < W)
 ErrorMessage wordMultiplication(word* C1, word* C0, word A, word B);
+//single precision squaring : A * A = C1 * W + C0 (0 <= A, C0, C1 < W)
+ErrorMessage wordSquaring(word* C1, word* C0, word A);
 
 
 #endif

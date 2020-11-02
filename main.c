@@ -1,11 +1,11 @@
-//memory leak detecter 
-#include <vld.h> 
+//memory leak detecter #include <vld.h> 
 #include <stdio.h>
 #include "CoreOperation.h"
 
 void showProcessDec(bigint* a, bigint* b, bigint* c, char op);
 void showProcessHex(bigint* a, bigint* b, bigint* c, char op);
 void showBigint(bigint* a, int needBracket);
+
 int main()
 {
 	
@@ -14,65 +14,11 @@ int main()
 	bigint* b = NULL;
 	bigint* mul = NULL;
 
-	//one number is 0
-	printf("Test 1\n");
-	big_set_zero(&a);
-	word words[5] = { 0x01,0x02,0x03,0x04,0x05 };
-	big_set_by_array(&b, NON_NEGATIVE, words, 5);
-	big_multiplication(&mul, a, b);
-	showProcessDec(a, b, mul, '*');
-	printf("\n");
-
-	//one number is 1
-	printf("Test 2\n");
-	big_set_one(&a);
-	big_set_by_string(&b, NEGATIVE, "123456789abcdef", 16);
-	big_multiplication(&mul, a, b);
-
-	showProcessDec(a, b, mul, '*');
-	printf("\n");
-
-	//one number is -1
-	printf("Test 3\n");
-	big_set_one(&a);
-	big_flip_sign(&a);
-	big_gen_rand(&b, NEGATIVE, 2);
-	big_multiplication(&mul, a, b);
-
-	showProcessDec(a, b, mul, '*');
-	printf("\n");
-
-	//sign test
-	printf("Test 4\n");
-	int sign1[4] = { NON_NEGATIVE,NON_NEGATIVE,NEGATIVE,NEGATIVE };
-	int sign2[4] = { NON_NEGATIVE,NEGATIVE,NON_NEGATIVE,NEGATIVE };
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i <= 100; i++)
 	{
-		printf("Operation %d\n", i + 1);
-		big_gen_rand(&a, sign1[i], 2);
-		big_gen_rand(&b, sign2[i], 2);
-	
-		big_multiplication(&mul, a, b);
-		showProcessDec(a, b, mul, '*');
-		printf("\n");
-	}
-
-	//random number operation
-	printf("Test 5\n");
-	for (int i = 0; i < 10; i++) {
-
-		printf("Operation %d\n", i + 1);
-		int aSign = rand() % 2;
-		int bSign = rand() % 2;
-		int aLength = rand() % 20 + 1;
-		int bLength = rand() % 20 + 1;
-
-		big_gen_rand(&a, aSign, aLength);
-		big_gen_rand(&b, bSign, bLength);
-		
-		big_multiplication(&mul, a, b);
-
-		showProcessHex(a, b, mul, '*');
+		word C0 = 0, C1 = 0, A = i;
+		wordSquaring(&C1, &C0, A);
+		printf("%d ", C1 * 256 + C0);
 	}
 	
 	big_delete(&a);
