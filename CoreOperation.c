@@ -161,7 +161,7 @@ ErrorMessage big_show_dec(bigint* x)
 	ten->a[0] = 10;
 
 	//output
-	//digits = n * ceil(log2) + 1   ( 0.3 < log2 < 0.4)
+	//digits =  ceil(n * log2) + 1   ( 0.3 < log2 < 0.4)
 	int digits = (int)ceil((double)x->wordlen * WORD_UNIT * 0.4) + 1;
 	int ptr = 0;
 	char* output = (char*)calloc(digits, sizeof(char));
