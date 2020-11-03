@@ -18,6 +18,51 @@ ErrorMessage array_fill(word* arr, int arrlen, int val)
 		*(arr + i) = val;
 	return SUCCESS;
 }
+void reverseStr(char* str)
+{
+	if (str == 0)
+	{
+		return;
+	}
+
+	/* skip empty string */
+	if (*str == 0)
+	{
+		return;
+	}
+
+	/* get range */
+	char* start = str;
+	char* end = start + strlen(str) - 1; /* -1 for \0 */
+	char temp;
+
+	/* reverse */
+	while (end > start)
+	{
+		/* swap */
+		temp = *start;
+		*start = *end;
+		*end = temp;
+
+		/* move */
+		++start;
+		--end;
+	}
+}
+char digit2char(word a)
+{
+	if (a == 0) return '0';
+	else if (a == 1) return '1';
+	else if (a == 2) return '2';
+	else if (a == 3) return '3';
+	else if (a == 4) return '4';
+	else if (a == 5) return '5';
+	else if (a == 6) return '6';
+	else if (a == 7) return '7';
+	else if (a == 8) return '8';
+	else if (a == 9) return '9';
+	else return '\0';
+}
 unsigned int hex2int(char c)
 {
 	if (c >= 'a' && c <= 'z')
@@ -124,7 +169,7 @@ ErrorMessage wordLongDivision(word* Q, word A1, word A0, word B)
 	
 	for (int i = w - 1; i >= 0; i--)
 	{
-		if (R >= (1 << w - 1))
+		if (R >= (1 << (w - 1)))
 		{
 			(*Q) += (1 << i);
 			R <<= 1;

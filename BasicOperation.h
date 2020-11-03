@@ -3,6 +3,7 @@
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "BigInt.h"
 #include "ErrorMessage.h"
 #define byte unsigned char
@@ -13,6 +14,10 @@
 ErrorMessage array_rand(word* dst, int wordlen);
 //fill word array with value
 ErrorMessage array_fill(word* arr, int arrlen, int val);
+//reverse string
+void reverseStr(char* str);
+//convert digit to charnum
+char digit2char(word a);
 //convert hex char to int
 unsigned int hex2int(char c);
 //check if char is valid char in base

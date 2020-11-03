@@ -123,16 +123,12 @@ ErrorMessage big_set_by_string(bigint** x, int sign, char* str, int base) {
 ErrorMessage big_show_hex(bigint* x) {
 	if (x == NULL)
 		return FAIL_NULL;
-	int i;
+	big_refine(x);
 	int wordlen = x->wordlen;
-	if (x->sign)
-		//	printf("sign : negative,       ");
+	if (x->sign == NEGATIVE)
 		printf("-");
-	//else
-	//	printf("sign : non - negative, ");
-	
 	printf("0x");
-	for (i = wordlen - 1; i >= 0; i--)
+	for (int i = wordlen - 1; i >= 0; i--)
 	{
 #if WORD_UNIT==8
 		printf("%02x", x->a[i]);
@@ -142,44 +138,64 @@ ErrorMessage big_show_hex(bigint* x) {
 		printf("%016llx", x->a[i]);
 #endif
 	}
-	//printf("\n");
 	return SUCCESS;
 }
-ErrorMessage big_show_dec(bigint* x) //TODO , current max value = 2^64-1
+ErrorMessage big_show_dec(bigint* x)
 {
 	if (x == NULL)
 		return FAIL_NULL;
-	int i;
+	big_refine(x);
 	int wordlen = x->wordlen;
-	if (x->sign)
-		printf("sign : negative,       ");
-	else
-		printf("sign : non - negative, ");
-	unsigned long long output = 0;
-	for (i = wordlen - 1; i >= 0; i--)
+	bigint* tmpX = NULL;
+	bigint* ten = NULL;
+	bigint* digit = NULL;
+	big_assign(&tmpX, x);
+
+	if (x->sign == NEGATIVE)
 	{
-#if WORD_UNIT==8
-		output <<= 8;
-#elif WORD_UNIT==32
-		output <<= 32;
-#elif WORD_UNIT==64
-		output <<= 64;
-#endif
-		output += (x->a[i]);
+		printf("-");
+		big_flip_sign(&tmpX);
 	}
-	printf("%llu\n", output);
+
+	big_new(&ten, NON_NEGATIVE, 1);
+	ten->a[0] = 10;
+
+	//output
+	//digits = n * ceil(log2) + 1   ( 0.3 < log2 < 0.4)
+	int digits = (int)ceil((double)x->wordlen * WORD_UNIT * 0.4) + 1;
+	int ptr = 0;
+	char* output = (char*)calloc(digits, sizeof(char));
+	if (output == NULL)
+		return FAIL_NULL;
+
+	// while x != 0 , x /= 10, digit = x % 10, (output||digit)
+	while (!big_is_zero(tmpX))
+	{
+		big_division(&tmpX, &digit, tmpX, ten);
+		output[ptr] = digit2char(digit->a[0]);
+		ptr++;
+	}
+	output[ptr] = '\0';
+
+	//reverse
+	reverseStr(output);
+
+	//output
+	printf("%s", output);
+
+	free(output);
+	big_delete(&ten);
+	big_delete(&digit);
 	return SUCCESS;
 }
 ErrorMessage big_show_dec_for_each_word(bigint* x) {
 	if (x == NULL)
 		return FAIL_NULL;
-	int i;
+	big_refine(x);
 	int wordlen = x->wordlen;
-	if (x->sign)
-		printf("sign : negative,       ");
-	else
-		printf("sign : non - negative, ");
-	for (i = wordlen - 1; i >= 0; i--)
+	if (x->sign == NEGATIVE)
+		printf("-");
+	for (int i = wordlen - 1; i >= 0; i--)
 	{
 #if WORD_UNIT==8
 		printf("%03d:", x->a[i]);
@@ -189,19 +205,17 @@ ErrorMessage big_show_dec_for_each_word(bigint* x) {
 		printf("%020llu:", x->a[i]);
 #endif
 	}
-	printf("\n");
 	return SUCCESS;
 }
 ErrorMessage big_show_bin(bigint* x) {
 	if (x == NULL)
 		return FAIL_NULL;
-	int i;
+	big_refine(x);
 	int wordlen = x->wordlen;
-	if (x->sign)
-		printf("sign : negative,       ");
-	else
-		printf("sign : non - negative, ");
-	for (i = wordlen - 1; i >= 0; i--)
+	if (x->sign == NEGATIVE)
+		printf("-");
+	printf("0b");
+	for (int i = wordlen - 1; i >= 0; i--)
 	{
 		word current = x->a[i];
 		int length = WORD_UNIT;
@@ -209,9 +223,7 @@ ErrorMessage big_show_bin(bigint* x) {
 		{
 			printf("%d", (current >> length) & 0x1);
 		}
-		printf(":");
 	}
-	printf("\n");
 	return SUCCESS;
 }
 ErrorMessage big_refine(bigint* x) {
@@ -1010,7 +1022,7 @@ ErrorMessage big_multiplicationKaratsuba(bigint** z, bigint* x, bigint* y)
 	else
 	{
 		// calculate shift bit
-		unsigned int l = MAX(xWordlen, yWordlen);
+		int l = MAX(xWordlen, yWordlen);
 		l = l >> 1;
 		// init
 		bigint* A1 = NULL;
@@ -1227,7 +1239,7 @@ ErrorMessage big_squaringKaratsuba(bigint** z, bigint* x)
 	else
 	{
 		// calculate shift bit
-		unsigned int l = xWordlen >> 1;
+		int l = xWordlen >> 1;
 
 		//alloc
 		bigint* A1 = NULL;
@@ -1377,9 +1389,7 @@ ErrorMessage big_divisionCore(word* q, bigint** r, bigint* x, bigint* y)
 		int k = 0;
 		word MSW = y->a[y->wordlen - 1];
 		while (MSW >>= 1)
-		{
 			k++;
-		}
 		bigint* tmpA = NULL;
 		bigint* tmpB = NULL;
 		word tmpQ = 0;
