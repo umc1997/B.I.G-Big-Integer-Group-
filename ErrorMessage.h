@@ -11,6 +11,7 @@
 // invalid error
 #define FAIL_INVALID_BASE 0x00020001
 #define FAIL_INVALID_CHARACTER 0x00020002
+#define FAIL_INVALID_DIVISOR 0x00020003
 
 typedef int ErrorMessage;
 

@@ -1287,3 +1287,84 @@ ErrorMessage big_squaringKaratsuba(bigint** z, bigint* x)
 	}
 	return SUCCESS;
 }
+
+ErrorMessage big_division(bigint** q, bigint** r, bigint* x, bigint* y)
+{
+	if (x == NULL || y == NULL)
+		return FAIL_NULL;
+	// don't define y <= 0 
+	if (y->sign == NEGATIVE || big_is_zero(y))
+		return FAIL_INVALID_DIVISOR;
+	// alloc
+	bigint* tmpQ = NULL;
+	bigint* tmpR = NULL;
+
+	big_refine(x);
+	big_refine(y);
+
+	if (big_compare(x, y) == SMALLER)
+	{
+		big_set_zero(&tmpQ);
+		big_assign(&tmpR, x);
+	}
+	else if (big_compare(x, y) == EQUAL)
+	{
+		big_set_one(&tmpQ);
+		big_set_zero(&tmpR);
+	}
+	else if (x->sign == NON_NEGATIVE)
+	{
+		big_divisionABS(&tmpQ, &tmpR, x, y);
+	}
+	else
+	{
+		bigint* absX = NULL;
+		bigint* one = NULL;
+		big_assign(&absX, x);
+		absX->sign = NON_NEGATIVE;
+
+		// calculate Q' and R'
+		big_divisionABS(&tmpQ, &tmpR, absX, y);
+
+		// calculate Q and R  ,  Q = -Q' - 1, R = B - R'
+		big_set_one(&one);
+		big_addition(&tmpQ, tmpQ, one);
+		big_flip_sign(&tmpQ);
+		big_substraction(&tmpR, y, tmpR);
+		big_delete(&absX);
+		big_delete(&one);
+	}
+	big_assign(q, tmpQ);
+	big_assign(r, tmpR);
+	big_delete(&tmpQ);
+	big_delete(&tmpR);
+	return SUCCESS;
+}
+ErrorMessage big_divisionABS(bigint** q, bigint** r, bigint* x, bigint* y)
+{
+	int qWordlen = x->wordlen - y->wordlen + 1;
+	int rWordlen = y->wordlen;
+
+	// alloc
+	(*q)->sign = NON_NEGATIVE;
+	(*q)->wordlen = qWordlen;
+	word* qReallocWords = (word*)realloc((*q)->a, qWordlen * sizeof(word));
+	if (qReallocWords == NULL)
+		return FAIL_OUT_OF_MEMORY;
+	else
+		(*q)->a = qReallocWords;
+
+	(*r)->sign = NON_NEGATIVE;
+	(*r)->wordlen = rWordlen;
+	word* rReallocWords = (word*)realloc((*r)->a, rWordlen * sizeof(word));
+	if (rReallocWords == NULL)
+		return FAIL_OUT_OF_MEMORY;
+	else
+		(*r)->a = rReallocWords;
+	 
+	// core function
+
+	big_refine(*q);
+	big_refine(*r);
+	return SUCCESS;
+}

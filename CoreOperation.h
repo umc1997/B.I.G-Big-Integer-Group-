@@ -124,5 +124,7 @@ ErrorMessage big_squaringKaratsuba(bigint** z, bigint* x);
 // division x = y * q + r (0 <= r < y)
 // divide x with y , calculate q and r ( 0 <= r < y) , assign to q and r (input: y > 0)
 ErrorMessage big_division(bigint** q, bigint** r, bigint* x, bigint* y);
+// divide x with y , calculate q and r ( 0 <= r < y) , assign to q and r (input:x > 0, y > 0, x > y)
+ErrorMessage big_divisionABS(bigint** q, bigint** r, bigint* x, bigint* y);
 
 #endif
