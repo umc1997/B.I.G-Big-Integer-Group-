@@ -108,8 +108,8 @@ ErrorMessage big_multiplicationABS(bigint** z, bigint* x, bigint* y);
 ErrorMessage big_multiplicationSchoolBook(bigint** z, bigint* x, bigint* y);
 // multiply x and y ignore sign, assign to z using karatsuba algorithm (use for wordlen(x) or wordlen(y) > karaFlag) 
 ErrorMessage big_multiplicationKaratsuba(bigint** z, bigint* x, bigint* y);
-// multiply bigint x and const int y, assign to z ( y range = int range )
-ErrorMessage big_multiplicationConst(bigint** z, bigint* x, const int y);
+// multiply bigint x and const int y, assign to z ( y range = word range )
+ErrorMessage big_multiplicationConst(bigint** z, bigint* x, word y);
 
 // squaring z = x * x
 // square x , assign to z
@@ -126,5 +126,8 @@ ErrorMessage big_squaringKaratsuba(bigint** z, bigint* x);
 ErrorMessage big_division(bigint** q, bigint** r, bigint* x, bigint* y);
 // divide x with y , calculate q and r ( 0 <= r < y) , assign to q and r (input:x > 0, y > 0, x > y)
 ErrorMessage big_divisionABS(bigint** q, bigint** r, bigint* x, bigint* y);
-
+// divide x with y , calculate q and r ( 0 <= r < y) , assign to q and r (input:x > 0, y > 0, y < x < y * W)
+ErrorMessage big_divisionCore(word* q, bigint** r, bigint* x, bigint* y);
+// divide x with y , calculate q and r ( 0 <= r < y) , assign to q and r (input:x > 0, y > 0, y < x < y * W)
+ErrorMessage big_divisionCoreCore(word* q, bigint** r, bigint* x, bigint* y);
 #endif

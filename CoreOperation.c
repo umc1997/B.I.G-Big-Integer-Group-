@@ -1084,11 +1084,11 @@ ErrorMessage big_multiplicationKaratsuba(bigint** z, bigint* x, bigint* y)
 	}
 	return SUCCESS;
 }
-ErrorMessage big_multiplicationConst(bigint** z, bigint* x, const int y)
+ErrorMessage big_multiplicationConst(bigint** z, bigint* x, word y)
 {
 	if (x == NULL)
 		return FAIL_NULL;
-	int constant = y;
+	word constant = y;
 	//alloc
 	bigint* tmp = NULL;
 	big_assign(&tmp, x);
@@ -1098,11 +1098,6 @@ ErrorMessage big_multiplicationConst(bigint** z, bigint* x, const int y)
 	}
 	else 
 	{
-		if (constant < 0)
-		{
-			big_flip_sign(&tmp);
-			constant *= -1;
-		}
 		bigint* tmp2 = NULL;
 		big_set_zero(&tmp2);
 		while (constant != 1)
@@ -1342,29 +1337,100 @@ ErrorMessage big_division(bigint** q, bigint** r, bigint* x, bigint* y)
 }
 ErrorMessage big_divisionABS(bigint** q, bigint** r, bigint* x, bigint* y)
 {
-	int qWordlen = x->wordlen - y->wordlen + 1;
-	int rWordlen = y->wordlen;
-
 	// alloc
-	(*q)->sign = NON_NEGATIVE;
-	(*q)->wordlen = qWordlen;
-	word* qReallocWords = (word*)realloc((*q)->a, qWordlen * sizeof(word));
-	if (qReallocWords == NULL)
-		return FAIL_OUT_OF_MEMORY;
-	else
-		(*q)->a = qReallocWords;
+	int qWordlen = x->wordlen;
+	big_new(q, NON_NEGATIVE, qWordlen);
+	big_set_zero(r);
 
-	(*r)->sign = NON_NEGATIVE;
-	(*r)->wordlen = rWordlen;
-	word* rReallocWords = (word*)realloc((*r)->a, rWordlen * sizeof(word));
-	if (rReallocWords == NULL)
-		return FAIL_OUT_OF_MEMORY;
-	else
-		(*r)->a = rReallocWords;
-	 
-	// core function
+	// main logic
+	for (int i = x->wordlen - 1; i > -1; i--)
+	{
+		bigint* A = NULL;
+		word Ai[1] = { x->a[i] };
+		big_set_by_array(&A, NON_NEGATIVE, Ai, 1);
+		big_word_left_shift(r, *r, 1);		
+		big_addition(r, *r, A);
+		
+		word Qi = 0;
+		big_divisionCore(&Qi, r, *r, y);
+		(*q)->a[i] = Qi;
+		big_delete(&A);
+	}
 
 	big_refine(*q);
 	big_refine(*r);
+	return SUCCESS;
+}
+ErrorMessage big_divisionCore(word* q, bigint** r, bigint* x, bigint* y)
+{
+	if (x == NULL || y == NULL)
+		return FAIL_NULL;
+
+	if (big_compare(x, y) == SMALLER)
+	{
+		*q = 0;
+		big_assign(r, x);
+	}
+	else
+	{
+		//compute k such that 2^w-1 <= 2^k * Bm < 2^w 
+		int k = 0;
+		word MSW = y->a[y->wordlen - 1];
+		while (MSW >>= 1)
+		{
+			k++;
+		}
+		bigint* tmpA = NULL;
+		bigint* tmpB = NULL;
+		word tmpQ = 0;
+		bigint* tmpR = NULL;
+
+		big_bit_left_shift(&tmpA, x, k);
+		big_bit_left_shift(&tmpB, y, k);
+
+		big_divisionCoreCore(&tmpQ, &tmpR, tmpA, tmpB);
+
+		big_bit_right_shift(r, tmpR, k);
+		*q = &tmpQ;
+
+		big_delete(&tmpA);
+		big_delete(&tmpB);
+		big_delete(&tmpR);
+	}
+
+	return SUCCESS;
+}
+
+ErrorMessage big_divisionCoreCore(word* q, bigint** r, bigint* x, bigint* y)
+{
+	if (x == NULL || y == NULL)
+		return FAIL_NULL;
+
+	int xWordlen = x->wordlen;
+	int yWordlen = y->wordlen;
+
+	if (xWordlen == yWordlen)
+	{
+		*q = (x->a[yWordlen - 1] / y->a[yWordlen - 1]);
+	}
+	else
+	{
+		if (x->a[yWordlen] == y->a[yWordlen - 1])
+			*q = WORD_UNIT - 1;
+		else
+		{
+			wordLongDivision(q, x->a[yWordlen], x->a[yWordlen - 1], y->a[yWordlen - 1]);
+		}
+	}
+	bigint* BQ = NULL;
+	big_multiplicationConst(&BQ, y, *q);
+
+	big_substraction(r, x, BQ);
+	while ((*r)->sign == NEGATIVE)
+	{
+		(*q) -= 1;
+		big_addition(r, *r, y);
+	}
+	big_delete(&BQ);
 	return SUCCESS;
 }

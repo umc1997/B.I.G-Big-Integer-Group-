@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include "CoreOperation.h"
 
-void showProcessDec(bigint* a, bigint* b, bigint* c, char op);
 void showProcessHex(bigint* a, bigint* b, bigint* c, char op);
 void showBigint(bigint* a, int needBracket);
 
@@ -12,46 +11,40 @@ int main()
 	srand((unsigned)time(NULL));
 	bigint* a = NULL;
 	bigint* b = NULL;
-	bigint* mul = NULL;
+	bigint* q = NULL;
+	bigint* r = NULL;
 
-	//showProcessHex(a, b, mul, '*');
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < 10; i++)
 	{
-		big_gen_rand(&a, NON_NEGATIVE, 10);
+		big_gen_rand(&a, NON_NEGATIVE, 2);
+		big_gen_rand(&b, NON_NEGATIVE, 1);
+	
+		big_division(&q, &r, a, b);
+		showProcessHex(a, b, q, '/');
 		
-		big_squaring(&mul, a);
-
-		showProcessHex(a, a, mul, '*');
 	}
 	big_delete(&a);
 	big_delete(&b);
-	big_delete(&mul);
+	big_delete(&q);
+	big_delete(&r);
 	
 	return 0;
 }
-void showProcessDec(bigint* a, bigint* b, bigint* c, char op)
-{
-	showBigint(a, 1);
-	printf(" %c ", op);
-	showBigint(b, 1);
-	printf(" = ");
-	showBigint(c, 0);
-	printf("\n");
-}
+
 void showProcessHex(bigint* a, bigint* b, bigint* c, char op)
 {
 	printf("a = ");
 	big_show_hex(a);
-	//printf("\n");
-	//printf("b = ");
-	//big_show_hex(b);
 	printf("\n");
-	printf("if a %c a == ", op);
+	printf("b = ");
+	big_show_hex(b);
+	printf("\n");
+	printf("if a %c/ b == ", op);
 	big_show_hex(c);
 	printf(":\n\t");
 	printf("print(1)\n");
 	printf("else:\n\t");
-	printf("print(hex(a*a))\n");
+	printf("print(hex(a//b))\n");
 }
 void showBigint(bigint* a, int needBracket)
 {

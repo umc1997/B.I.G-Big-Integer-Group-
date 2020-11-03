@@ -116,3 +116,32 @@ ErrorMessage wordSquaring(word* C1, word* C0, word A)
 
 	return SUCCESS;
 }
+ErrorMessage wordLongDivision(word* Q, word A1, word A0, word B)
+{
+	(*Q) = 0;
+	word R = A1;
+	int w = WORD_UNIT;
+	
+	for (int i = w - 1; i >= 0; i--)
+	{
+		if (R >= (1 << w - 1))
+		{
+			(*Q) += (1 << i);
+			R <<= 1;
+			R += ((A0 >> i) & 1);
+			R -= B;
+		}
+		else
+		{
+			R *= 2;
+			R += ((A0 >> i) & 1);
+			if (R >= B)
+			{
+				(*Q) += (1 << i);
+				R -= B;
+			}
+		}
+	}
+
+	return SUCCESS;
+}

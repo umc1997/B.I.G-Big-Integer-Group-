@@ -21,6 +21,7 @@ int IsValidChar(char c, int base);
 ErrorMessage wordMultiplication(word* C1, word* C0, word A, word B);
 //single precision squaring : A * A = C1 * W + C0 (0 <= A, C0, C1 < W)
 ErrorMessage wordSquaring(word* C1, word* C0, word A);
-
+//2 - words long division : find Q such that A(A1W+A0) = BQ + R (0 <= R < B)
+ErrorMessage wordLongDivision(word* Q, word A1, word A0, word B);
 
 #endif
