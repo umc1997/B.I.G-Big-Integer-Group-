@@ -1391,7 +1391,7 @@ ErrorMessage big_divisionCore(word* q, bigint** r, bigint* x, bigint* y)
 		big_divisionCoreCore(&tmpQ, &tmpR, tmpA, tmpB);
 
 		big_bit_right_shift(r, tmpR, k);
-		*q = &tmpQ;
+		*q = tmpQ;
 
 		big_delete(&tmpA);
 		big_delete(&tmpB);

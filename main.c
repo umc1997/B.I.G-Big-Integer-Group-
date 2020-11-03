@@ -1,8 +1,10 @@
-//memory leak detecter #include <vld.h> 
+//memory leak detecter 
+#include <vld.h> 
 #include <stdio.h>
 #include "CoreOperation.h"
 
 void showProcessHex(bigint* a, bigint* b, bigint* c, char op);
+void showProcessHexDiv(bigint* a, bigint* b, bigint* q, bigint* r);
 void showBigint(bigint* a, int needBracket);
 
 int main()
@@ -14,13 +16,14 @@ int main()
 	bigint* q = NULL;
 	bigint* r = NULL;
 
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 100; i++)
 	{
-		big_gen_rand(&a, NON_NEGATIVE, 2);
-		big_gen_rand(&b, NON_NEGATIVE, 1);
-	
+		big_gen_rand(&a, NON_NEGATIVE, 10);
+		big_gen_rand(&b, NON_NEGATIVE, 3);
+		if (big_is_zero(b))
+			continue;
 		big_division(&q, &r, a, b);
-		showProcessHex(a, b, q, '/');
+		showProcessHexDiv(a, b, q, r);
 		
 	}
 	big_delete(&a);
@@ -45,6 +48,27 @@ void showProcessHex(bigint* a, bigint* b, bigint* c, char op)
 	printf("print(1)\n");
 	printf("else:\n\t");
 	printf("print(hex(a//b))\n");
+}
+void showProcessHexDiv(bigint* a, bigint* b, bigint* q, bigint* r)
+{
+	printf("a = ");
+	big_show_hex(a);
+	printf("\n");
+	printf("b = ");
+	big_show_hex(b);
+	printf("\n");
+	printf("q = ");
+	big_show_hex(q);
+	printf("\n");
+	printf("r = ");
+	big_show_hex(r);
+	printf("\n");
+	printf("if a == b * q + r ");
+	printf(":\n\t");
+	printf("print(1)\n");
+	printf("else:\n");
+	printf("\tprint(hex(a // b))\n");
+	printf("\tprint(hex(a - b * (a // b)))\n");
 }
 void showBigint(bigint* a, int needBracket)
 {
