@@ -14,13 +14,17 @@ int main()
 	bigint* q = NULL;
 	bigint* r = NULL;
 
-	big_new(&b, NON_NEGATIVE, 1);
+/*	big_new(&b, NON_NEGATIVE, 1);
 	b->a[0] = 10;
+*/
 	for (int i = 0; i < 100; i++)
 	{
 		big_gen_rand(&a, NON_NEGATIVE, 10);
+		big_gen_rand(&b, NON_NEGATIVE, 9);
+
 		big_division(&q, &r, a, b);
 		showProcessHexDiv(a, b, q, r);
+
 		/*printf("a = ");
 		big_show_hex(a);
 		printf("\n");
