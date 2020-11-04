@@ -14,19 +14,24 @@ int main()
 	bigint* q = NULL;
 	bigint* r = NULL;
 
-/*	big_new(&b, NON_NEGATIVE, 1);
-	b->a[0] = 10;
-*/
 	for (int i = 0; i < 100; i++)
 	{
-		big_gen_rand(&a, NON_NEGATIVE, 10);
-		big_gen_rand(&b, NON_NEGATIVE, 9);
+		int aSign = rand() % 2;
+		int bSign = NON_NEGATIVE;
+		int aWordlen = rand() % 20 + 1;
+		int bWordlen = rand() % aWordlen + 1;
+		big_gen_rand(&a, aSign, aWordlen);
+		big_gen_rand(&b, bSign, bWordlen);
+		if (big_is_zero(b))
+			continue;
 
 		big_division(&q, &r, a, b);
 		showProcessHexDiv(a, b, q, r);
 
-		/*printf("a = ");
-		big_show_hex(a);
+		/*
+		show_by_dec test
+		printf("a = ");
+		big_show_bin(a);
 		printf("\n");
 		printf("b = ");
 		big_show_dec(a);	

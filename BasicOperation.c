@@ -169,9 +169,9 @@ ErrorMessage wordLongDivision(word* Q, word A1, word A0, word B)
 	
 	for (int i = w - 1; i >= 0; i--)
 	{
-		if (R >= (1 << (w - 1)))
+		if (R >= ((word)1 << (w - 1)))
 		{
-			(*Q) += (1 << i);
+			(*Q) += ((word)1 << i);
 			R <<= 1;
 			R += ((A0 >> i) & 1);
 			R -= B;
@@ -182,7 +182,7 @@ ErrorMessage wordLongDivision(word* Q, word A1, word A0, word B)
 			R += ((A0 >> i) & 1);
 			if (R >= B)
 			{
-				(*Q) += (1 << i);
+				(*Q) += ((word)1 << i);
 				R -= B;
 			}
 		}

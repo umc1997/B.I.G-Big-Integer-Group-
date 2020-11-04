@@ -221,7 +221,7 @@ ErrorMessage big_show_bin(bigint* x) {
 		int length = WORD_UNIT;
 		while (length--)
 		{
-			printf("%d", (current >> length) & 0x1);
+			printf("%d", (int)(current >> length) & 0x1);
 		}
 	}
 	return SUCCESS;
