@@ -11,8 +11,7 @@ show_by_dec 함수 구현완료
 
 장기 수정사항:
 1. 예외 처리
-2. visual studio warning : buffer overrun
 
 
 ~11.30
-exp 함수
+mod_exp 함수

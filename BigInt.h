@@ -1,7 +1,7 @@
 #ifndef BIGINT_H
 #define BIGINT_H
 
-#define WORD_UNIT 64 //8 32 64
+#define WORD_UNIT 8 //8 32 64
 #define NON_NEGATIVE 0
 #define NEGATIVE 1
 
