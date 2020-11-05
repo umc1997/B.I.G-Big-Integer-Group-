@@ -163,7 +163,7 @@ ErrorMessage wordSquaring(word* C1, word* C0, word A)
 }
 ErrorMessage wordLongDivision(word* Q, word A1, word A0, word B)
 {
-	(*Q) = 0;
+	*Q = 0;
 	word R = A1;
 	int w = WORD_UNIT;
 	
@@ -178,7 +178,7 @@ ErrorMessage wordLongDivision(word* Q, word A1, word A0, word B)
 		}
 		else
 		{
-			R *= 2;
+			R >>= 1;
 			R += ((A0 >> i) & 1);
 			if (R >= B)
 			{

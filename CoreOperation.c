@@ -186,6 +186,7 @@ ErrorMessage big_show_dec(bigint* x)
 	free(output);
 	big_delete(&ten);
 	big_delete(&digit);
+	big_delete(&tmpX);
 	return SUCCESS;
 }
 ErrorMessage big_show_dec_for_each_word(bigint* x) {
