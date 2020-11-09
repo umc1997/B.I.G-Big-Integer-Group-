@@ -82,17 +82,17 @@ unsigned int hex2int(char c)
 		return 0;
 	}
 }
-int isValidChar(char c, int base)
+bool isValidChar(char c, int base)
 {
 	if (base == 2)
 	{
 		if (c != '0' && c != '1')
-			return 0;
+			return false;
 	}
 	else if (base == 10)
 	{
 		if (!(c >= '0' && c <= '9'))
-			return 0;
+			return false;
 	}
 	else if (base == 16)
 	{
@@ -100,11 +100,11 @@ int isValidChar(char c, int base)
 		else if (c >= 'A' && c <= 'Z') {}
 		else if (c >= '0' && c <= '9') {}
 		else
-			return 0;
+			return false;
 	}
 	else
-		return 0;
-	return 1;
+		return false;
+	return true;
 }
 
 ErrorMessage wordMultiplication(word* C1, word* C0, word A, word B)

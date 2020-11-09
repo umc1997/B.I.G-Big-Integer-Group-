@@ -37,15 +37,15 @@ int big_get_sign(bigint* x);
 
 // checker
 // return x == 0 (0 = x is not zero , 1 = x is zero)
-int big_is_zero(bigint* x);
+bool big_is_zero(bigint* x);
 // return x == 1 (0 = x is not one , 1 = x is one)
-int big_is_one(bigint* x);
+bool big_is_one(bigint* x);
 // return x == -1 (0 = x is not minus one, 1 = x is minus one)
-int big_is_minus_one(bigint* x);
+bool big_is_minus_one(bigint* x);
 // return x is odd
-int big_is_odd(bigint* x);
+bool big_is_odd(bigint* x);
 // return x is even
-int big_is_even(bigint* x);
+bool big_is_even(bigint* x);
 
 // shower
 // show big int with hex
@@ -57,7 +57,7 @@ ErrorMessage big_show_dec_for_each_word(bigint* x);
 // show big int with bin
 ErrorMessage big_show_bin(bigint* x);
 
-// erase 0 value words in front of bigint 
+// erase useless 0 words in front of bigint 
 ErrorMessage big_refine(bigint* x);
 
 // assign src bigint to dst bigint
@@ -95,7 +95,6 @@ ErrorMessage big_word_reduction(bigint** dst, bigint* src, int count);
 ErrorMessage big_addition(bigint** z, bigint* x, bigint* y);
 // add x and y ignore sign, assign to z (input:x > 0, y > 0, z != x ,z != y) 
 ErrorMessage big_additionABS(bigint** z, bigint* x, bigint* y);
-// additionConst 
 
 // substraction z = x - y
 // substract y from x, assign to z

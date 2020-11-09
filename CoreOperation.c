@@ -321,19 +321,19 @@ ErrorMessage big_set_one(bigint** x) {
 	(*x)->a[0] = 0x1;
 	return SUCCESS;
 }
-int big_is_zero(bigint* x) {
+bool big_is_zero(bigint* x) {
 	if (x == NULL)
 		return FAIL_NULL;
 	big_refine(x);
 	return (x->sign == NON_NEGATIVE) && (x->wordlen == 1) && (x->a[0] == 0x0);
 }
-int big_is_one(bigint* x) {
+bool big_is_one(bigint* x) {
 	if (x == NULL)
 		return FAIL_NULL;
 	big_refine(x);
 	return (x->sign == NON_NEGATIVE) && (x->wordlen == 1) && (x->a[0] == 0x1);
 }
-int big_is_minus_one(bigint* x)
+bool big_is_minus_one(bigint* x)
 {
 	if (x == NULL)
 		return FAIL_NULL;
@@ -341,14 +341,14 @@ int big_is_minus_one(bigint* x)
 	return (x->sign == NEGATIVE) && (x->wordlen == 1) && (x->a[0] == 0x1);
 	
 }
-int big_is_odd(bigint* x)
+bool big_is_odd(bigint* x)
 {
 	if (x == NULL)
 		return FAIL_NULL;
 	big_refine(x);
 	return (big_get_bit(x, 0) == 1);
 }
-int big_is_even(bigint* x)
+bool big_is_even(bigint* x)
 {
 	if (x == NULL)
 		return FAIL_NULL;

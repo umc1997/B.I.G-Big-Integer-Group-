@@ -1,5 +1,6 @@
 #ifndef BASICOPERATION_H
 #define BASICOPERATION_H
+#include <stdbool.h>
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,7 +21,7 @@ char digit2char(word a);
 //convert hex char to int
 unsigned int hex2int(char c);
 //check if char is valid char in base
-int isValidChar(char c, int base);
+bool isValidChar(char c, int base);
 //single precision multiplication : A * B = C1 * W + C0  (0 <= A,B,C0,C1 < W)
 ErrorMessage wordMultiplication(word* C1, word* C0, word A, word B);
 //single precision squaring : A * A = C1 * W + C0 (0 <= A, C0, C1 < W)
