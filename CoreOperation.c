@@ -36,7 +36,7 @@ ErrorMessage big_set_by_string(bigint** x, int sign, char* str, int base) {
 	for (int i = 0; i < strLen; i++)
 	{
 		char currentChar = *(str + i);
-		if (!IsValidChar(currentChar, base))
+		if (!isValidChar(currentChar, base))
 			return FAIL_INVALID_CHARACTER;
 
 	}
@@ -1460,6 +1460,52 @@ ErrorMessage big_divisionCoreCore(word* q, bigint** r, bigint* x, bigint* y)
 	big_delete(&BQ);
 	return SUCCESS;
 }
+ErrorMessage big_mod(bigint** z, bigint* x, bigint* y)
+{
+	if (x == NULL || y == NULL)
+		return FAIL_NULL;
+	// don't define y <= 0 
+	if (y->sign == NEGATIVE || big_is_zero(y))
+		return FAIL_INVALID_DIVISOR;
+	// alloc
+	bigint* tmpQ = NULL;
+	bigint* tmpR = NULL;
+
+	big_refine(x);
+	big_refine(y);
+
+	if (big_compare(x, y) == SMALLER)
+	{
+		big_assign(&tmpR, x);
+	}
+	else if (big_compare(x, y) == EQUAL)
+	{
+		big_set_zero(&tmpR);
+	}
+	else if (x->sign == NON_NEGATIVE)
+	{
+		big_divisionABS(&tmpQ, &tmpR, x, y);
+	}
+	else
+	{
+		bigint* absX = NULL;
+		bigint* one = NULL;
+		big_assign(&absX, x);
+		absX->sign = NON_NEGATIVE;
+
+		// calculate Q' and R'
+		big_divisionABS(&tmpQ, &tmpR, absX, y);
+
+		// calculate Q and R,  Q = -Q' - 1, R = B - R'
+		big_substraction(&tmpR, y, tmpR);
+		big_delete(&absX);
+		big_delete(&one);
+	}
+	big_assign(z, tmpR);
+	big_delete(&tmpQ);
+	big_delete(&tmpR);
+	return SUCCESS;
+}
 
 ErrorMessage big_mod_exp(bigint** z, bigint* x, bigint* n, bigint* y)
 {
@@ -1499,7 +1545,11 @@ ErrorMessage big_mod_exp(bigint** z, bigint* x, bigint* n, bigint* y)
 }
 ErrorMessage big_mod_expABS(bigint** z, bigint* x, bigint* n, bigint* y)
 {
-	
+	// x = x mod y
+	big_mod(z, *z, y);
+
+	// choose main logic 
+
 	big_mod_expL2R(z, x, n, y);
 	//big_mod_expR2L(z, x, n, y);
 	//big_mod_expMS(z, x, n, y);
@@ -1509,25 +1559,82 @@ ErrorMessage big_mod_expABS(bigint** z, bigint* x, bigint* n, bigint* y)
 }
 ErrorMessage big_mod_expL2R(bigint** z, bigint* x, bigint* n, bigint* y)
 {
+	// t = 1
 	big_set_one(z);
 	int nbitlen = big_get_bitlen(n);
-	bigint* q = NULL;
+
+	// mul and squaring loop
 	for (int i = nbitlen - 1; i > -1; i--)
 	{
+		// t = t ^ 2
 		big_squaring(z, *z);
+		// mod
+		big_mod(z, *z, y);
+		// t = t * x ^ bit
 		if (big_get_bit(n, i))
+		{
 			big_multiplication(z, *z, x);
-		//mod
-		big_division(&q, z, *z, y);
+			// mod
+			big_mod(z, *z, y);
+		}
 	}
-	big_delete(&q);
 	return SUCCESS;
 }
 ErrorMessage big_mod_expR2L(bigint** z, bigint* x, bigint* n, bigint* y)
 {
+	bigint* t1 = NULL;
+	int nbitlen = big_get_bitlen(n);
+	// t0 = 1, t1 = x
+	big_set_one(z);
+	big_assign(&t1, x);
+
+	// mul and squaring loop
+	for (int i = 0; i < nbitlen; i++)
+	{
+		// t0 = t0 * t1 ^ bit
+		if (big_get_bit(n, i))
+		{
+			big_multiplication(z, *z, t1);
+			// mod
+			big_mod(z, *z, y);
+		}
+		// t1 = t1 ^ 2
+		big_squaring(&t1, t1);
+		//mod
+		big_mod(&t1, t1, y);
+	}
+
+	big_delete(&t1);
 	return SUCCESS;
 }
 ErrorMessage big_mod_expMS(bigint** z, bigint* x, bigint* n, bigint* y)
 {
+	bigint* t1 = NULL;
+	int nbitlen = big_get_bitlen(n);
+	// t0 = 1, t1 = x
+	big_set_one(z);
+	big_assign(&t1, x);
+
+	// mul and squaring loop
+	for (int i = nbitlen - 1; i > -1; i--)
+	{
+		// if ni = 0 -> t1 = t0 * t1, t0 = t0 ^ 2
+		if (big_get_bit(n, i) == 0)
+		{
+			big_multiplication(&t1, t1, *z);
+			big_squaring(z, *z);
+		}
+		// if ni = 1 -> t0 = t0 * t1, t1 = t1 ^2 
+		else
+		{
+			big_multiplication(z, *z, t1);
+			big_squaring(&t1, t1);
+		}
+		//mod
+		big_mod(&t1, t1, y);
+		big_mod(z, *z, y);
+	}
+
+	big_delete(&t1);
 	return SUCCESS;
 }

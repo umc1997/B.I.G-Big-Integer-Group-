@@ -82,7 +82,7 @@ unsigned int hex2int(char c)
 		return 0;
 	}
 }
-int IsValidChar(char c, int base)
+int isValidChar(char c, int base)
 {
 	if (base == 2)
 	{

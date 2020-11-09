@@ -135,6 +135,9 @@ ErrorMessage big_divisionCore(word* q, bigint** r, bigint* x, bigint* y);
 // divide x with y , calculate q and r ( 0 <= r < y) , assign to q and r (input:x > 0, y > 0, y <= x < y * W)
 ErrorMessage big_divisionCoreCore(word* q, bigint** r, bigint* x, bigint* y);
 
+// modular z = x mod y
+ErrorMessage big_mod(bigint** z, bigint* x, bigint* y);
+
 // modular exponeniation z = x ^ n mod y
 // compute x ^ n and modular y, assign to z (input: n >= 0 , y > 0)
 ErrorMessage big_mod_exp(bigint** z, bigint* x, bigint* n, bigint* y);
