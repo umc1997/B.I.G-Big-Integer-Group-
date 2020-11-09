@@ -11,10 +11,13 @@
 
 #if WORD_UNIT == 8 
 #define word unsigned char
+#define WORD_MASK 0xff
 #elif WORD_UNIT == 32
 #define word unsigned int
+#define WORD_MASK 0xffffffff
 #elif WORD_UNIT == 64
 #define word unsigned long long
+#define WORD_MASK 0xffffffffffffffff
 #endif
 
 

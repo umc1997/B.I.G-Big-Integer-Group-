@@ -7,7 +7,6 @@
 #include "BigInt.h"
 #include "ErrorMessage.h"
 #define byte unsigned char
-
 #define MAX(A,B) A>B? A:B
 
 //generate random numbers and fill word array 

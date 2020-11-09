@@ -161,6 +161,7 @@ ErrorMessage wordSquaring(word* C1, word* C0, word A)
 
 	return SUCCESS;
 }
+//TODO
 ErrorMessage wordLongDivision(word* Q, word A1, word A0, word B)
 {
 	*Q = 0;
@@ -178,7 +179,7 @@ ErrorMessage wordLongDivision(word* Q, word A1, word A0, word B)
 		}
 		else
 		{
-			R >>= 1;
+			R <<= 1;
 			R += ((A0 >> i) & 1);
 			if (R >= B)
 			{

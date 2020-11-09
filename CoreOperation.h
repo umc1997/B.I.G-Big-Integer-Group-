@@ -42,6 +42,10 @@ int big_is_zero(bigint* x);
 int big_is_one(bigint* x);
 // return x == -1 (0 = x is not minus one, 1 = x is minus one)
 int big_is_minus_one(bigint* x);
+// return x is odd
+int big_is_odd(bigint* x);
+// return x is even
+int big_is_even(bigint* x);
 
 // shower
 // show big int with hex
@@ -126,9 +130,22 @@ ErrorMessage big_squaringKaratsuba(bigint** z, bigint* x);
 ErrorMessage big_division(bigint** q, bigint** r, bigint* x, bigint* y);
 // divide x with y , calculate q and r ( 0 <= r < y) , assign to q and r (input:x > 0, y > 0, x > y)
 ErrorMessage big_divisionABS(bigint** q, bigint** r, bigint* x, bigint* y);
-// divide x with y , calculate q and r ( 0 <= r < y) , assign to q and r (input:x > 0, y > 0, y < x < y * W)
+// divide x with y , calculate q and r ( 0 <= r < y) , assign to q and r (input:x > 0, y > 0, y <= x < y * W)
 ErrorMessage big_divisionCore(word* q, bigint** r, bigint* x, bigint* y);
-// divide x with y , calculate q and r ( 0 <= r < y) , assign to q and r (input:x > 0, y > 0, y < x < y * W)
+// divide x with y , calculate q and r ( 0 <= r < y) , assign to q and r (input:x > 0, y > 0, y <= x < y * W)
 ErrorMessage big_divisionCoreCore(word* q, bigint** r, bigint* x, bigint* y);
+
+// modular exponeniation z = x ^ n mod y
+// compute x ^ n and modular y, assign to z (input: n >= 0 , y > 0)
+ErrorMessage big_mod_exp(bigint** z, bigint* x, bigint* y, bigint* n);
+// compute x ^ n and modular y, assign to z (input: n >= 0 , x > 0. y > 0)
+ErrorMessage big_mod_expABS(bigint** z, bigint* x, bigint* y, bigint* n);
+// compute x ^ n and modular y, assign to z using left to right algorithm(input: n > 0 , x > 0. y > 0)
+ErrorMessage big_mod_expL2R(bigint** z, bigint* x, bigint* y, bigint* n);
+// compute x ^ n and modular y, assign to z using rigth to right algorithm(input: n > 0 , x > 0. y > 0)
+ErrorMessage big_mod_expR2L(bigint** z, bigint* x, bigint* y, bigint* n);
+// compute x ^ n and modular y, assign to z using multiply and squaring algorithm(input: n > 0 , x > 0. y > 0)
+ErrorMessage big_mod_expMS(bigint** z, bigint* x, bigint* y, bigint* n);
+
 
 #endif

@@ -341,6 +341,20 @@ int big_is_minus_one(bigint* x)
 	return (x->sign == NEGATIVE) && (x->wordlen == 1) && (x->a[0] == 0x1);
 	
 }
+int big_is_odd(bigint* x)
+{
+	if (x == NULL)
+		return FAIL_NULL;
+	big_refine(x);
+	return (big_get_bit(x, 0) == 1);
+}
+int big_is_even(bigint* x)
+{
+	if (x == NULL)
+		return FAIL_NULL;
+	big_refine(x);
+	return (big_get_bit(x, 0) == 0);
+}
 int big_compare(bigint* x, bigint* y) {
 	if (x == NULL || y == NULL)
 		return FAIL_NULL;
@@ -1000,7 +1014,7 @@ ErrorMessage big_multiplicationSchoolBook(bigint** z, bigint* x, bigint* y)
 			T->a[i + j] = B;
 
 			// tmp = tmp + T
-			big_additionABS(&tmp, tmp, T);
+			big_addition(&tmp, tmp, T);
 
 			big_delete(&T);
 		}
@@ -1216,7 +1230,7 @@ ErrorMessage big_squaringSchoolBook(bigint** z, bigint* x)
 			T->a[i + j] = B;
 
 			// tmp = tmp + T
-			big_additionABS(&C2, C2, T);
+			big_addition(&C2, C2, T);
 			big_delete(&T);
 		}
 	}
@@ -1334,7 +1348,7 @@ ErrorMessage big_division(bigint** q, bigint** r, bigint* x, bigint* y)
 		// calculate Q' and R'
 		big_divisionABS(&tmpQ, &tmpR, absX, y);
 
-		// calculate Q and R  ,  Q = -Q' - 1, R = B - R'
+		// calculate Q and R,  Q = -Q' - 1, R = B - R'
 		big_set_one(&one);
 		big_addition(&tmpQ, tmpQ, one);
 		big_flip_sign(&tmpQ);
@@ -1412,6 +1426,7 @@ ErrorMessage big_divisionCore(word* q, bigint** r, bigint* x, bigint* y)
 	return SUCCESS;
 }
 
+//TODO
 ErrorMessage big_divisionCoreCore(word* q, bigint** r, bigint* x, bigint* y)
 {
 	if (x == NULL || y == NULL)
@@ -1427,7 +1442,7 @@ ErrorMessage big_divisionCoreCore(word* q, bigint** r, bigint* x, bigint* y)
 	else
 	{
 		if (x->a[yWordlen] == y->a[yWordlen - 1])
-			*q = WORD_UNIT - 1;
+			*q = WORD_MASK;
 		else
 		{
 			wordLongDivision(q, x->a[yWordlen], x->a[yWordlen - 1], y->a[yWordlen - 1]);
@@ -1443,5 +1458,76 @@ ErrorMessage big_divisionCoreCore(word* q, bigint** r, bigint* x, bigint* y)
 		big_addition(r, *r, y);
 	}
 	big_delete(&BQ);
+	return SUCCESS;
+}
+
+ErrorMessage big_mod_exp(bigint** z, bigint* x, bigint* y, bigint* n)
+{
+	if (x == NULL || y == NULL)
+		return FAIL_NULL;
+	// don't define y <= 0 
+	if (y->sign == NEGATIVE || big_is_zero(y))
+		return FAIL_INVALID_DIVISOR;
+	if (n->sign == NEGATIVE)
+		return FAIL_INVALID_EXPONENT;
+	// alloc
+	bigint* tmp = NULL;
+	
+	if (big_is_zero(x))
+	{
+		big_set_zero(&tmp);
+	}
+	else if (x->sign == NON_NEGATIVE)
+	{
+		big_mod_expABS(&tmp, x, y, n);
+	}
+	else
+	{
+		bigint* absX = NULL;
+		big_assign(&absX, x);
+		absX->sign = NON_NEGATIVE;
+		big_mod_expABS(&tmp, absX, y, n);
+		if (big_is_odd(n))
+			tmp->sign = NEGATIVE;
+		big_delete(&absX);
+	}
+
+	big_assign(z, tmp);
+	big_delete(&tmp);
+
+	return SUCCESS;
+}
+ErrorMessage big_mod_expABS(bigint** z, bigint* x, bigint* y, bigint* n)
+{
+	big_set_one(z);
+
+	big_mod_expL2R(z, x, y, n);
+	//big_mod_expR2L(z, x, y, n);
+	//big_mod_expMS(z, x, y, n);
+	
+	big_refine(*z);
+	return SUCCESS;
+}
+ErrorMessage big_mod_expL2R(bigint** z, bigint* x, bigint* y, bigint* n)
+{
+	int nbitlen = big_get_bitlen(n);
+	bigint* q = NULL;
+	for (int i = nbitlen - 1; i > -1; i--)
+	{
+		big_squaring(z, *z);
+		if (big_get_bit(n, i))
+			big_multiplication(z, *z, x);
+		//mod
+		big_division(&q, z, *z, y);
+	}
+	big_delete(&q);
+	return SUCCESS;
+}
+ErrorMessage big_mod_expR2L(bigint** z, bigint* x, bigint* y, bigint* n)
+{
+	return SUCCESS;
+}
+ErrorMessage big_mod_expMS(bigint** z, bigint* x, bigint* y, bigint* n)
+{
 	return SUCCESS;
 }

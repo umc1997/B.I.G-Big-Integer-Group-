@@ -4,6 +4,21 @@
 
 void showProcessHex(bigint* a, bigint* b, bigint* c, char op);
 void showProcessHexDiv(bigint* a, bigint* b, bigint* q, bigint* r);
+/*
+int main()
+{
+	bigint* a = NULL;
+	bigint* b = NULL;
+	bigint* n = NULL;
+	bigint* c = NULL;
+	// c = a ^ n mod b
+	big_set_by_string(&a, NON_NEGATIVE, "31", 10);
+	big_set_by_string(&n, NON_NEGATIVE, "3", 10);
+	big_set_by_string(&b, NON_NEGATIVE, "11", 10);
+
+	big_mod_exp(&c, a, b, n);
+	big_show_dec(c);
+}*/
 
 int main()
 {
@@ -13,8 +28,8 @@ int main()
 	bigint* b = NULL;
 	bigint* q = NULL;
 	bigint* r = NULL;
-
-	for (int i = 0; i < 100; i++)
+	/**/
+	for (int i = 0; i < 1000; i++)
 	{
 		int aSign = rand() % 2;
 		int bSign = NON_NEGATIVE;
@@ -27,16 +42,6 @@ int main()
 
 		big_division(&q, &r, a, b);
 		showProcessHexDiv(a, b, q, r);
-
-		/*
-		show_by_dec test
-		printf("a = ");
-		big_show_bin(a);
-		printf("\n");
-		printf("b = ");
-		big_show_dec(a);	
-		printf("\n");
-		printf("print(a == b)\n");*/
 	}
 	big_delete(&a);
 	big_delete(&b);
@@ -75,7 +80,7 @@ void showProcessHexDiv(bigint* a, bigint* b, bigint* q, bigint* r)
 	printf("r = ");
 	big_show_hex(r);
 	printf("\n");
-	printf("if a == b * q + r ");
+	printf("if (a == b * q + r) and (b > r) ");
 	printf(":\n\t");
 	printf("print(\"True\")\n");
 	printf("else:\n");

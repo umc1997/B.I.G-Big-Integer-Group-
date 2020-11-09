@@ -21,6 +21,8 @@ void printErrorMessage(ErrorMessage msg) {
 		printf("Error: Please enter valid character (<bin: 0, 1> ,<dec:0 ~ 9>, <hex:0 ~ f>) (INVALID_CHARACTER) .\n");
 	case(FAIL_INVALID_DIVISOR):
 		printf("Error: Divisor must be a positive number (INVALID_DIVISOR) .\n");
+	case(FAIL_INVALID_EXPONENT):
+		printf("Error: Exponent must be a non-negative number (INVALID_EXPONENT) .\n");
 		break;
 	}
 }
