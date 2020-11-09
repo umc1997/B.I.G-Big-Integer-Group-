@@ -2,69 +2,64 @@
 #include <stdio.h>
 #include "CoreOperation.h"
 
-void showProcessHex(bigint* a, bigint* b, bigint* c, char op);
+void showProcessHexSqu(bigint* a, bigint* c);
 void showProcessHexDiv(bigint* a, bigint* b, bigint* q, bigint* r);
-/*
+
 int main()
 {
 	bigint* a = NULL;
 	bigint* b = NULL;
 	bigint* n = NULL;
 	bigint* c = NULL;
-	// c = a ^ n mod b
-	big_set_by_string(&a, NON_NEGATIVE, "31", 10);
-	big_set_by_string(&n, NON_NEGATIVE, "3", 10);
-	big_set_by_string(&b, NON_NEGATIVE, "11", 10);
+	for (int i = 0; i < 1000; i++) {
 
-	big_mod_exp(&c, a, b, n);
-	big_show_dec(c);
-}*/
-
-int main()
-{
-
-	srand((unsigned)time(NULL));
-	bigint* a = NULL;
-	bigint* b = NULL;
-	bigint* q = NULL;
-	bigint* r = NULL;
-	/**/
-	for (int i = 0; i < 1000; i++)
-	{
-		int aSign = rand() % 2;
-		int bSign = NON_NEGATIVE;
 		int aWordlen = rand() % 20 + 1;
-		int bWordlen = rand() % aWordlen + 1;
-		big_gen_rand(&a, aSign, aWordlen);
-		big_gen_rand(&b, bSign, bWordlen);
-		if (big_is_zero(b))
-			continue;
+		int bWordlen = rand() % 20 + 1;
 
-		big_division(&q, &r, a, b);
-		showProcessHexDiv(a, b, q, r);
+		big_gen_rand(&a, NON_NEGATIVE, aWordlen);
+		big_set_by_string(&n, NON_NEGATIVE, "3", 16);
+		big_gen_rand(&b, NON_NEGATIVE, bWordlen);
+
+		big_mod_exp(&c, a, n, b);
+
+		printf("a = ");
+		big_show_hex(a);
+		printf("\n");
+		printf("n = ");
+		big_show_hex(n);
+		printf("\n");
+		printf("b = ");
+		big_show_hex(b);
+		printf("\n");
+		printf("c = ");
+		big_show_hex(c);
+		printf("\n");
+		printf("if pow(a, n, b) == c");
+		printf(":\n\t");
+		printf("print(\"True\")\n");
+		printf("else:\n\t");
+		printf("print(\"False\")\n");
 	}
 	big_delete(&a);
 	big_delete(&b);
-	big_delete(&q);
-	big_delete(&r);
-	
+	big_delete(&n);
+	big_delete(&c);
+
 	return 0;
 }
 
-void showProcessHex(bigint* a, bigint* b, bigint* c, char op)
+
+void showProcessHexSqu(bigint* a, bigint* c)
 {
 	printf("a = ");
 	big_show_hex(a);
 	printf("\n");
-	printf("b = ");
-	big_show_hex(b);
-	printf("\n");
-	printf("if a %c/ b == ", op);
+	printf("if a ** 2 == ");
 	big_show_hex(c);
 	printf(":\n\t");
 	printf("print(\"True\")\n");
 	printf("else:\n\t");
-	printf("print(hex(a//b))\n");
+	printf("print(a ** 2)\n");
 }
 void showProcessHexDiv(bigint* a, bigint* b, bigint* q, bigint* r)
 {

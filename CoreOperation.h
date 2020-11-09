@@ -137,15 +137,15 @@ ErrorMessage big_divisionCoreCore(word* q, bigint** r, bigint* x, bigint* y);
 
 // modular exponeniation z = x ^ n mod y
 // compute x ^ n and modular y, assign to z (input: n >= 0 , y > 0)
-ErrorMessage big_mod_exp(bigint** z, bigint* x, bigint* y, bigint* n);
+ErrorMessage big_mod_exp(bigint** z, bigint* x, bigint* n, bigint* y);
 // compute x ^ n and modular y, assign to z (input: n >= 0 , x > 0. y > 0)
-ErrorMessage big_mod_expABS(bigint** z, bigint* x, bigint* y, bigint* n);
+ErrorMessage big_mod_expABS(bigint** z, bigint* x, bigint* n, bigint* y);
 // compute x ^ n and modular y, assign to z using left to right algorithm(input: n > 0 , x > 0. y > 0)
-ErrorMessage big_mod_expL2R(bigint** z, bigint* x, bigint* y, bigint* n);
+ErrorMessage big_mod_expL2R(bigint** z, bigint* x, bigint* n, bigint* y);
 // compute x ^ n and modular y, assign to z using rigth to right algorithm(input: n > 0 , x > 0. y > 0)
-ErrorMessage big_mod_expR2L(bigint** z, bigint* x, bigint* y, bigint* n);
+ErrorMessage big_mod_expR2L(bigint** z, bigint* x, bigint* n, bigint* y);
 // compute x ^ n and modular y, assign to z using multiply and squaring algorithm(input: n > 0 , x > 0. y > 0)
-ErrorMessage big_mod_expMS(bigint** z, bigint* x, bigint* y, bigint* n);
+ErrorMessage big_mod_expMS(bigint** z, bigint* x, bigint* n, bigint* y);
 
 
 #endif

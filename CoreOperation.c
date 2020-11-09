@@ -1461,7 +1461,7 @@ ErrorMessage big_divisionCoreCore(word* q, bigint** r, bigint* x, bigint* y)
 	return SUCCESS;
 }
 
-ErrorMessage big_mod_exp(bigint** z, bigint* x, bigint* y, bigint* n)
+ErrorMessage big_mod_exp(bigint** z, bigint* x, bigint* n, bigint* y)
 {
 	if (x == NULL || y == NULL)
 		return FAIL_NULL;
@@ -1479,14 +1479,14 @@ ErrorMessage big_mod_exp(bigint** z, bigint* x, bigint* y, bigint* n)
 	}
 	else if (x->sign == NON_NEGATIVE)
 	{
-		big_mod_expABS(&tmp, x, y, n);
+		big_mod_expABS(&tmp, x, n, y);
 	}
 	else
 	{
 		bigint* absX = NULL;
 		big_assign(&absX, x);
 		absX->sign = NON_NEGATIVE;
-		big_mod_expABS(&tmp, absX, y, n);
+		big_mod_expABS(&tmp, absX, n, y);
 		if (big_is_odd(n))
 			tmp->sign = NEGATIVE;
 		big_delete(&absX);
@@ -1497,19 +1497,19 @@ ErrorMessage big_mod_exp(bigint** z, bigint* x, bigint* y, bigint* n)
 
 	return SUCCESS;
 }
-ErrorMessage big_mod_expABS(bigint** z, bigint* x, bigint* y, bigint* n)
+ErrorMessage big_mod_expABS(bigint** z, bigint* x, bigint* n, bigint* y)
 {
-	big_set_one(z);
-
-	big_mod_expL2R(z, x, y, n);
-	//big_mod_expR2L(z, x, y, n);
-	//big_mod_expMS(z, x, y, n);
+	
+	big_mod_expL2R(z, x, n, y);
+	//big_mod_expR2L(z, x, n, y);
+	//big_mod_expMS(z, x, n, y);
 	
 	big_refine(*z);
 	return SUCCESS;
 }
-ErrorMessage big_mod_expL2R(bigint** z, bigint* x, bigint* y, bigint* n)
+ErrorMessage big_mod_expL2R(bigint** z, bigint* x, bigint* n, bigint* y)
 {
+	big_set_one(z);
 	int nbitlen = big_get_bitlen(n);
 	bigint* q = NULL;
 	for (int i = nbitlen - 1; i > -1; i--)
@@ -1523,11 +1523,11 @@ ErrorMessage big_mod_expL2R(bigint** z, bigint* x, bigint* y, bigint* n)
 	big_delete(&q);
 	return SUCCESS;
 }
-ErrorMessage big_mod_expR2L(bigint** z, bigint* x, bigint* y, bigint* n)
+ErrorMessage big_mod_expR2L(bigint** z, bigint* x, bigint* n, bigint* y)
 {
 	return SUCCESS;
 }
-ErrorMessage big_mod_expMS(bigint** z, bigint* x, bigint* y, bigint* n)
+ErrorMessage big_mod_expMS(bigint** z, bigint* x, bigint* n, bigint* y)
 {
 	return SUCCESS;
 }
