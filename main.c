@@ -2,80 +2,65 @@
 #include <stdio.h>
 #include "CoreOperation.h"
 
-void showProcessHexSqu(bigint* a, bigint* c);
-void showProcessHexDiv(bigint* a, bigint* b, bigint* q, bigint* r);
+void showProcessHexModExp(bigint* a, bigint* n, bigint* b, bigint* c);
+
 int main()
 {
-
 	srand((unsigned)time(NULL));
+
+	clock_t start, end;
 	bigint* a = NULL;
 	bigint* b = NULL;
-	bigint* q = NULL;
-	bigint* r = NULL;
-	bigint* s = NULL;
-	//squaring test
-	for (int i = 0; i < 1000; i++)
-	{
-		int aSign = rand() % 2;
-		int aWordlen = rand() % 20 + 1;
-		big_gen_rand(&a, aSign, aWordlen);
-		big_squaring(&s, a);
-		showProcessHexSqu(a, s);
+	bigint* n = NULL;
+	bigint* c = NULL;
+	int testCase = 1000;
+	int aWordlen = 10;
+	int bWordlen = 10;
+	big_set_by_string(&n, NON_NEGATIVE, "10001", 16);
+
+	for (int i = 0; i < 5; i++) {
+		start = clock();
+		for (int t = 0; t < testCase; t++) {
+
+			//generate random big integer
+			big_gen_rand(&a, NON_NEGATIVE, aWordlen);
+			big_gen_rand(&b, NON_NEGATIVE, bWordlen);
+			while (big_is_zero(b))
+				big_gen_rand(&b, NON_NEGATIVE, bWordlen);
+
+			//mod_exp
+			big_mod_exp(&c, a, n, b);
+
+		}
+		end = clock();
+		float dif = (float)(end - start) / CLOCKS_PER_SEC;
+		printf("%f\n", dif / testCase);
 	}
 
-	//division test
-	for (int i = 0; i < 1000; i++)
-	{
-		int aSign = rand() % 2;
-		int bSign = NON_NEGATIVE;
-		int aWordlen = rand() % 20 + 1;
-		int bWordlen = rand() % aWordlen + 1;
-		big_gen_rand(&a, aSign, aWordlen);
-		big_gen_rand(&b, bSign, bWordlen);
-		if (big_is_zero(b))
-			continue;
-
-		big_division(&q, &r, a, b);
-		showProcessHexDiv(a, b, q, r);
-	}
 	big_delete(&a);
 	big_delete(&b);
-	big_delete(&q);
-	big_delete(&r);
-	big_delete(&s);
+	big_delete(&c);
+	big_delete(&n);
+
 	return 0;
 }
-
-void showProcessHexSqu(bigint* a, bigint* c)
+void showProcessHexModExp(bigint* a, bigint* n, bigint* b, bigint* c)
 {
 	printf("a = ");
 	big_show_hex(a);
 	printf("\n");
-	printf("if a ** 2 == ");
-	big_show_hex(c);
-	printf(":\n\t");
-	printf("print(\"True\")\n");
-	printf("else:\n\t");
-	printf("print(a ** 2)\n");
-}
-void showProcessHexDiv(bigint* a, bigint* b, bigint* q, bigint* r)
-{
-	printf("a = ");
-	big_show_hex(a);
+	printf("n = ");
+	big_show_hex(n);
 	printf("\n");
 	printf("b = ");
 	big_show_hex(b);
 	printf("\n");
-	printf("q = ");
-	big_show_hex(q);
+	printf("c = ");
+	big_show_hex(c);
 	printf("\n");
-	printf("r = ");
-	big_show_hex(r);
-	printf("\n");
-	printf("if (a == b * q + r) and (b > r) ");
+	printf("if pow(a, n, b) == c");
 	printf(":\n\t");
 	printf("print(\"True\")\n");
-	printf("else:\n");
-	printf("\tprint(hex(a // b))\n");
-	printf("\tprint(hex(a - b * (a // b)))\n");
-}
+	printf("else:\n\t");
+	printf("print(\"False\")\n");
+}	
