@@ -1,5 +1,4 @@
-//memory leak detecter 
-#include <vld.h> 
+//memory leak detecter #include <vld.h> 
 #include <stdio.h>
 #include "CoreOperation.h"
 
@@ -12,23 +11,23 @@ int main()
 	bigint* b = NULL;
 	bigint* n = NULL;
 	bigint* c = NULL;
-	int testCase = 400;
+	int testCase = 1000;
 #if EXPMODMODE == 1
-	printf("Left-to-right\n");
+	printf("#Left-to-right\n");
 #elif EXPMODMODE == 2
-	printf("Right-to-left\n");
+	printf("#Right-to-left\n");
 #elif EXPMODMODE == 3
-	printf("Multiply and squaring\n");
+	printf("#Multiply and squaring\n");
 #endif
 	
 	start = clock();
 	big_set_by_string(&n, NON_NEGATIVE, "3", 16);
 
 	for (int t = 0; t < testCase; t++) {
-		int aWordlen = 1;
-		int bWordlen = 1;
+		int aWordlen = 10;
+		int bWordlen = 10;
 
-		printf("test %d\n", t);
+		printf("#test %d\n", t);
 		//generate random big integer
 		big_gen_rand(&a, NON_NEGATIVE, aWordlen);
 		big_gen_rand(&b, NON_NEGATIVE, bWordlen);
@@ -37,6 +36,7 @@ int main()
 
 		//mod_exp
 		big_mod_exp(&c, a, n, b);
+		
 
 		//check 
 		showProcessHexModExp(a, n, b, c);

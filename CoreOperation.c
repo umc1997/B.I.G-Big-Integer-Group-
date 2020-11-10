@@ -273,13 +273,19 @@ int big_get_wordlen(bigint* x) {
 int big_get_bitlen(bigint* x) {
 	if (x == NULL)
 		return FAIL_NULL;
+	word MSW = x->a[x->wordlen - 1];
+	int bitLen = 0;
 #if WORD_UNIT == 8
-	return (x->wordlen) << 3;
+	bitLen = (x->wordlen - 1) << 3;
 #elif WORD_UNIT == 32
-	return (x->wordlen) << 5;
+	bitLen = (x->wordlen - 1) << 5;
 #elif WORD_UNIT == 64
-	return (x->wordlen) << 6;
+	bitLen = (x->wordlen - 1) << 6;
 #endif
+	while (MSW >>= 1)
+		bitLen++;
+	bitLen++;
+	return bitLen;
 }
 int big_get_bit(bigint* x, int bitindex) {
 	if (x == NULL)
@@ -1567,11 +1573,12 @@ ErrorMessage big_mod_expABS(bigint** z, bigint* x, bigint* n, bigint* y)
 	big_refine(*z);
 	return SUCCESS;
 }
+//memory leak
 ErrorMessage big_mod_expL2R(bigint** z, bigint* x, bigint* n, bigint* y)
 {
+	int nbitlen = big_get_bitlen(n);
 	// t = 1
 	big_set_one(z);
-	int nbitlen = big_get_bitlen(n);
 
 	// mul and squaring loop
 	for (int i = nbitlen - 1; i > -1; i--)
