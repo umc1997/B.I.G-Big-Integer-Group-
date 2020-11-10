@@ -1,4 +1,5 @@
-//memory leak detecter #include <vld.h> 
+//memory leak detecter 
+#include <vld.h> 
 #include <stdio.h>
 #include "CoreOperation.h"
 
@@ -11,17 +12,25 @@ int main()
 	bigint* b = NULL;
 	bigint* n = NULL;
 	bigint* c = NULL;
-	float sum = 0;
-	int testCase = 200;
+	int testCase = 400;
+#if EXPMODMODE == 1
 	printf("Left-to-right\n");
-	for (int t = 0; t < testCase; t++) {
-		start = clock();
-		int aWordlen = 10;
-		int bWordlen = 10;
+#elif EXPMODMODE == 2
+	printf("Right-to-left\n");
+#elif EXPMODMODE == 3
+	printf("Multiply and squaring\n");
+#endif
+	
+	start = clock();
+	big_set_by_string(&n, NON_NEGATIVE, "3", 16);
 
+	for (int t = 0; t < testCase; t++) {
+		int aWordlen = 1;
+		int bWordlen = 1;
+
+		printf("test %d\n", t);
 		//generate random big integer
 		big_gen_rand(&a, NON_NEGATIVE, aWordlen);
-		big_set_by_string(&n, NON_NEGATIVE, "3", 16);
 		big_gen_rand(&b, NON_NEGATIVE, bWordlen);
 		while (big_is_zero(b))
 			big_gen_rand(&b, NON_NEGATIVE, bWordlen);
@@ -30,24 +39,12 @@ int main()
 		big_mod_exp(&c, a, n, b);
 
 		//check 
-		//showProcessHexModExp(a, n, b, c);
+		showProcessHexModExp(a, n, b, c);
 
-		end = clock();
-		float dif = (float)(end - start) / CLOCKS_PER_SEC;
-		if (dif > 0.02)
-		{
-			printf("overhead :\n");
-			printf("a = ");
-			big_show_hex(a);
-			printf("\n");
-			printf("b = ");
-			big_show_hex(b);
-			printf("\n");
-		}
-		sum += dif;
-		printf("Time test %d : %f\n", t + 1, dif);
 	}
-	printf("Average : %f\n", sum / testCase);
+	end = clock();
+	float dif = (float)(end - start) / CLOCKS_PER_SEC;
+	printf("Average : %f\n", dif / testCase);
 	big_delete(&a);
 	big_delete(&b);
 	big_delete(&n);

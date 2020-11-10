@@ -7,7 +7,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+
+#define EQUAL 0
+#define BIGGER 1
+#define SMALLER -1
+
 #define karaFlag 2
+
+#define EXPMODMODE 1 // 1 = L2R, 2 = R2L, 3 = MS
 
 // constructor
 ErrorMessage big_new(bigint** x, int sign, int wordlen);

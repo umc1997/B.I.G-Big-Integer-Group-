@@ -1321,6 +1321,8 @@ ErrorMessage big_division(bigint** q, bigint** r, bigint* x, bigint* y)
 	bigint* tmpQ = NULL;
 	bigint* tmpR = NULL;
 
+	big_new(&tmpQ, NON_NEGATIVE, 1);
+
 	big_refine(x);
 	big_refine(y);
 
@@ -1366,7 +1368,14 @@ ErrorMessage big_divisionABS(bigint** q, bigint** r, bigint* x, bigint* y)
 {
 	// alloc
 	int qWordlen = x->wordlen;
-	big_new(q, NON_NEGATIVE, qWordlen);
+	(*q)->sign = NON_NEGATIVE;
+	(*q)->wordlen = qWordlen;
+	word* reallocWords = (word*)realloc((*q)->a, qWordlen * sizeof(word));
+	if (reallocWords == NULL)
+		return FAIL_OUT_OF_MEMORY;
+	else
+		(*q)->a = reallocWords;
+
 	big_set_zero(r);
 
 	// main logic
@@ -1426,7 +1435,6 @@ ErrorMessage big_divisionCore(word* q, bigint** r, bigint* x, bigint* y)
 	return SUCCESS;
 }
 
-//TODO
 ErrorMessage big_divisionCoreCore(word* q, bigint** r, bigint* x, bigint* y)
 {
 	if (x == NULL || y == NULL)
@@ -1484,22 +1492,20 @@ ErrorMessage big_mod(bigint** z, bigint* x, bigint* y)
 	}
 	else if (x->sign == NON_NEGATIVE)
 	{
-		big_divisionABS(&tmpQ, &tmpR, x, y);
+		big_division(&tmpQ, &tmpR, x, y);
 	}
 	else
 	{
 		bigint* absX = NULL;
-		bigint* one = NULL;
 		big_assign(&absX, x);
 		absX->sign = NON_NEGATIVE;
 
 		// calculate Q' and R'
-		big_divisionABS(&tmpQ, &tmpR, absX, y);
+		big_division(&tmpQ, &tmpR, absX, y);
 
 		// calculate Q and R,  Q = -Q' - 1, R = B - R'
 		big_substraction(&tmpR, y, tmpR);
 		big_delete(&absX);
-		big_delete(&one);
 	}
 	big_assign(z, tmpR);
 	big_delete(&tmpQ);
@@ -1550,10 +1556,14 @@ ErrorMessage big_mod_expABS(bigint** z, bigint* x, bigint* n, bigint* y)
 
 	// choose main logic 
 
+#if EXPMODMODE == 1
 	big_mod_expL2R(z, x, n, y);
-	//big_mod_expR2L(z, x, n, y);
-	//big_mod_expMS(z, x, n, y);
-	
+#elif EXPMODMODE == 2
+	big_mod_expR2L(z, x, n, y);
+#elif EXPMODMODE == 3
+	big_mod_expMS(z, x, n, y);
+#endif
+
 	big_refine(*z);
 	return SUCCESS;
 }
