@@ -864,7 +864,7 @@ ErrorMessage big_substractionABS(bigint** z, bigint* x, bigint* y)
 		(*z)->a = reallocWords;
 
 
-	int borrow = 0;
+	word borrow = 0;
 	for (int i = 0; i < newWordlen; i++)
 	{
 		// A , B
@@ -1374,14 +1374,7 @@ ErrorMessage big_divisionABS(bigint** q, bigint** r, bigint* x, bigint* y)
 {
 	// alloc
 	int qWordlen = x->wordlen;
-	(*q)->sign = NON_NEGATIVE;
-	(*q)->wordlen = qWordlen;
-	word* reallocWords = (word*)realloc((*q)->a, qWordlen * sizeof(word));
-	if (reallocWords == NULL)
-		return FAIL_OUT_OF_MEMORY;
-	else
-		(*q)->a = reallocWords;
-
+	big_new(q, NON_NEGATIVE, qWordlen);
 	big_set_zero(r);
 
 	// main logic
@@ -1389,10 +1382,12 @@ ErrorMessage big_divisionABS(bigint** q, bigint** r, bigint* x, bigint* y)
 	{
 		bigint* A = NULL;
 		word Ai[1] = { x->a[i] };
+		// R = RW + Ai
 		big_set_by_array(&A, NON_NEGATIVE, Ai, 1);
 		big_word_left_shift(r, *r, 1);		
 		big_addition(r, *r, A);
 		
+		// (Qi, R) <- DIVC(R, B)
 		word Qi = 0;
 		big_divisionCore(&Qi, r, *r, y);
 		(*q)->a[i] = Qi;
@@ -1420,6 +1415,7 @@ ErrorMessage big_divisionCore(word* q, bigint** r, bigint* x, bigint* y)
 		word MSW = y->a[y->wordlen - 1];
 		while (MSW >>= 1)
 			k++;
+		k = WORD_UNIT - k - 1;
 		bigint* tmpA = NULL;
 		bigint* tmpB = NULL;
 		word tmpQ = 0;
@@ -1429,6 +1425,7 @@ ErrorMessage big_divisionCore(word* q, bigint** r, bigint* x, bigint* y)
 		big_bit_left_shift(&tmpB, y, k);
 
 		big_divisionCoreCore(&tmpQ, &tmpR, tmpA, tmpB);
+
 
 		big_bit_right_shift(r, tmpR, k);
 		*q = tmpQ;
@@ -1462,10 +1459,12 @@ ErrorMessage big_divisionCoreCore(word* q, bigint** r, bigint* x, bigint* y)
 			wordLongDivision(q, x->a[yWordlen], x->a[yWordlen - 1], y->a[yWordlen - 1]);
 		}
 	}
+	// R = A - BQ
 	bigint* BQ = NULL;
 	big_multiplicationConst(&BQ, y, *q);
 
 	big_substraction(r, x, BQ);
+ 	// while R < 0 
 	while ((*r)->sign == NEGATIVE)
 	{
 		(*q) -= 1;
@@ -1478,15 +1477,14 @@ ErrorMessage big_mod(bigint** z, bigint* x, bigint* y)
 {
 	if (x == NULL || y == NULL)
 		return FAIL_NULL;
+	big_refine(x);
+	big_refine(y);
 	// don't define y <= 0 
 	if (y->sign == NEGATIVE || big_is_zero(y))
 		return FAIL_INVALID_DIVISOR;
 	// alloc
 	bigint* tmpQ = NULL;
 	bigint* tmpR = NULL;
-
-	big_refine(x);
-	big_refine(y);
 
 	if (big_compare(x, y) == SMALLER)
 	{
@@ -1498,7 +1496,7 @@ ErrorMessage big_mod(bigint** z, bigint* x, bigint* y)
 	}
 	else if (x->sign == NON_NEGATIVE)
 	{
-		big_division(&tmpQ, &tmpR, x, y);
+		big_divisionABS(&tmpQ, &tmpR, x, y);
 	}
 	else
 	{
@@ -1507,7 +1505,7 @@ ErrorMessage big_mod(bigint** z, bigint* x, bigint* y)
 		absX->sign = NON_NEGATIVE;
 
 		// calculate Q' and R'
-		big_division(&tmpQ, &tmpR, absX, y);
+		big_divisionABS(&tmpQ, &tmpR, absX, y);
 
 		// calculate Q and R,  Q = -Q' - 1, R = B - R'
 		big_substraction(&tmpR, y, tmpR);
@@ -1573,26 +1571,29 @@ ErrorMessage big_mod_expABS(bigint** z, bigint* x, bigint* n, bigint* y)
 	big_refine(*z);
 	return SUCCESS;
 }
-//memory leak
 ErrorMessage big_mod_expL2R(bigint** z, bigint* x, bigint* n, bigint* y)
 {
-	int nbitlen = big_get_bitlen(n);
+	int nWordlen = n->wordlen;
 	// t = 1
 	big_set_one(z);
 
 	// mul and squaring loop
-	for (int i = nbitlen - 1; i > -1; i--)
+	for (int i = nWordlen - 1; i > -1; i--)
 	{
-		// t = t ^ 2
-		big_squaring(z, *z);
-		// mod
-		big_mod(z, *z, y);
-		// t = t * x ^ bit
-		if (big_get_bit(n, i))
+		word currentWord = n->a[i];
+		for (int j = WORD_UNIT - 1; j > -1; j--)
 		{
-			big_multiplication(z, *z, x);
+			// t = t ^ 2
+			big_squaring(z, *z);
 			// mod
 			big_mod(z, *z, y);
+
+			if ((currentWord >> j) & 0x1)
+			{
+				big_multiplication(z, *z, x);
+				// mod
+				big_mod(z, *z, y);
+			}
 		}
 	}
 	return SUCCESS;
@@ -1600,25 +1601,30 @@ ErrorMessage big_mod_expL2R(bigint** z, bigint* x, bigint* n, bigint* y)
 ErrorMessage big_mod_expR2L(bigint** z, bigint* x, bigint* n, bigint* y)
 {
 	bigint* t1 = NULL;
-	int nbitlen = big_get_bitlen(n);
+	int nWordlen = n->wordlen;
 	// t0 = 1, t1 = x
 	big_set_one(z);
 	big_assign(&t1, x);
 
 	// mul and squaring loop
-	for (int i = 0; i < nbitlen; i++)
+	for (int i = 0; i < nWordlen; i++)
 	{
-		// t0 = t0 * t1 ^ bit
-		if (big_get_bit(n, i))
+		word currentWord = n->a[i];
+		for (int j = 0; j < WORD_UNIT; j++)
 		{
-			big_multiplication(z, *z, t1);
-			// mod
-			big_mod(z, *z, y);
+			// t0 = t0 * t1 ^ bit
+			if (currentWord & 0x1)
+			{
+				big_multiplication(z, *z, t1);
+				// mod
+				big_mod(z, *z, y);
+			}
+			currentWord >>= 1;
+			// t1 = t1 ^ 2
+			big_squaring(&t1, t1);
+			//mod
+			big_mod(&t1, t1, y);
 		}
-		// t1 = t1 ^ 2
-		big_squaring(&t1, t1);
-		//mod
-		big_mod(&t1, t1, y);
 	}
 
 	big_delete(&t1);
@@ -1627,31 +1633,69 @@ ErrorMessage big_mod_expR2L(bigint** z, bigint* x, bigint* n, bigint* y)
 ErrorMessage big_mod_expMS(bigint** z, bigint* x, bigint* n, bigint* y)
 {
 	bigint* t1 = NULL;
-	int nbitlen = big_get_bitlen(n);
+	int nWordlen = n->wordlen;
 	// t0 = 1, t1 = x
 	big_set_one(z);
 	big_assign(&t1, x);
 
 	// mul and squaring loop
-	for (int i = nbitlen - 1; i > -1; i--)
+	for (int i = nWordlen - 1; i > -1; i--)
 	{
-		// if ni = 0 -> t1 = t0 * t1, t0 = t0 ^ 2
-		if (big_get_bit(n, i) == 0)
+		word currentWord = n->a[i];
+		for (int j = WORD_UNIT - 1; j > -1; j--)
 		{
-			big_multiplication(&t1, t1, *z);
-			big_squaring(z, *z);
+			// if ni = 0 -> t1 = t0 * t1, t0 = t0 ^ 2
+			if (((currentWord >> j) & 0x1) == 0)
+			{
+				big_multiplication(&t1, t1, *z);
+				big_squaring(z, *z);
+			}
+			// if ni = 1 -> t0 = t0 * t1, t1 = t1 ^2 
+			else
+			{
+				big_multiplication(z, *z, t1);
+				big_squaring(&t1, t1);
+			}
+			//mod
+			big_mod(&t1, t1, y);
+			big_mod(z, *z, y);
 		}
-		// if ni = 1 -> t0 = t0 * t1, t1 = t1 ^2 
-		else
-		{
-			big_multiplication(z, *z, t1);
-			big_squaring(&t1, t1);
-		}
-		//mod
-		big_mod(&t1, t1, y);
-		big_mod(z, *z, y);
 	}
 
 	big_delete(&t1);
+	return SUCCESS;
+}
+
+ErrorMessage big_gcd(bigint** z, bigint* x, bigint* y)
+{
+	if (x == NULL || y == NULL)
+		return FAIL_NULL;
+	big_refine(x);
+	big_refine(y);
+	
+	bigint* tmp = NULL;
+
+	big_gcdRecursive(&tmp, x, y);
+
+	big_assign(z, tmp);
+	big_delete(&tmp);
+
+	return SUCCESS;
+}
+ErrorMessage big_gcdRecursive(bigint** z, bigint* x, bigint* y)
+{
+	if (big_is_zero(y))
+		big_assign(z, x);
+	else
+	{
+		bigint* tmp = NULL;
+		// tmp = x % y
+		big_mod(&tmp, x, y);
+		// gcd(x, y) =  gcd(y, x % y)
+		big_gcdRecursive(z, y, tmp);
+		
+		big_delete(&tmp);
+	}
+
 	return SUCCESS;
 }

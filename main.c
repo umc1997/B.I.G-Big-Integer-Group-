@@ -1,4 +1,5 @@
-//memory leak detecter #include <vld.h> 
+//memory leak detecter 
+#include <vld.h> 
 #include <stdio.h>
 #include "CoreOperation.h"
 
@@ -6,6 +7,8 @@ void showProcessHexModExp(bigint* a, bigint* n, bigint* b, bigint* c);
 
 int main()
 {
+	srand((unsigned)time(NULL));
+
 	clock_t start, end;
 	bigint* a = NULL;
 	bigint* b = NULL;
@@ -23,9 +26,11 @@ int main()
 	start = clock();
 	big_set_by_string(&n, NON_NEGATIVE, "3", 16);
 
+	int aWordlen = 10;
+	int bWordlen = 10;
+
 	for (int t = 0; t < testCase; t++) {
-		int aWordlen = 10;
-		int bWordlen = 10;
+		
 
 		printf("#test %d\n", t);
 		//generate random big integer
@@ -34,17 +39,35 @@ int main()
 		while (big_is_zero(b))
 			big_gen_rand(&b, NON_NEGATIVE, bWordlen);
 
+		printf("a = ");
+		big_show_hex(a);
+		printf("\n");
+		printf("n = ");
+		big_show_hex(n);
+		printf("\n");
+		printf("b = ");
+		big_show_hex(b);
+		printf("\n");
+
 		//mod_exp
 		big_mod_exp(&c, a, n, b);
-		
+
+		printf("c = ");
+		big_show_hex(c);
+		printf("\n");
+		printf("if pow(a, n, b) == c");
+		printf(":\n\t");
+		printf("print(\"True\")\n");
+		printf("else:\n\t");
+		printf("print(\"False\")\n");
 
 		//check 
-		showProcessHexModExp(a, n, b, c);
+		//showProcessHexModExp(a, n, b, c);
 
 	}
 	end = clock();
 	float dif = (float)(end - start) / CLOCKS_PER_SEC;
-	printf("Average : %f\n", dif / testCase);
+	printf("#Average : %f\n", dif / testCase);
 	big_delete(&a);
 	big_delete(&b);
 	big_delete(&n);

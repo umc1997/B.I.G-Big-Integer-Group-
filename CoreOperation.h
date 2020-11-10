@@ -83,7 +83,7 @@ int big_compare(bigint* x, bigint* y);
 int big_compareABS(bigint* x, bigint* y);
 
 // shift & reduction operation
-// operating src and save it to dst
+// computing with src and save it to dst
 // left bit shift ( *dst = (src << count) )
 ErrorMessage big_bit_left_shift(bigint** dst, bigint* src, int count);
 // right bit shift ( *dst = (src >> count) )
@@ -142,9 +142,10 @@ ErrorMessage big_divisionCore(word* q, bigint** r, bigint* x, bigint* y);
 ErrorMessage big_divisionCoreCore(word* q, bigint** r, bigint* x, bigint* y);
 
 // modular z = x mod y
+// compute modular z = x mod y (input: y > 0)
 ErrorMessage big_mod(bigint** z, bigint* x, bigint* y);
 
-// modular exponeniation z = x ^ n mod y
+// modular exponentiation z = x ^ n mod y
 // compute x ^ n and modular y, assign to z (input: n >= 0 , y > 0)
 ErrorMessage big_mod_exp(bigint** z, bigint* x, bigint* n, bigint* y);
 // compute x ^ n and modular y, assign to z (input: n >= 0 , x > 0. y > 0)
@@ -156,5 +157,10 @@ ErrorMessage big_mod_expR2L(bigint** z, bigint* x, bigint* n, bigint* y);
 // compute x ^ n and modular y, assign to z using multiply and squaring algorithm(input: n > 0 , x > 0. y > 0)
 ErrorMessage big_mod_expMS(bigint** z, bigint* x, bigint* n, bigint* y);
 
+// great common divisor of x and y , z = gcd(x, y)
+// compute great common divisor of x and y , z = gcd(x, y) (input: x >= 0, y >= 0)
+ErrorMessage big_gcd(bigint** z, bigint* x, bigint* y);
+// compute great common divisor of x and y , z = gcd(x, y) (input: x >= 0, y >= 0, z != x, z != y)
+ErrorMessage big_gcdRecursive(bigint** z, bigint* x, bigint* y);
 
 #endif
