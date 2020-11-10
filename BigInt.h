@@ -24,5 +24,4 @@ typedef struct {
 	word* a;
 }bigint;
 
-
 #endif

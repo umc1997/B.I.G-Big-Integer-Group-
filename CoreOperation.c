@@ -675,7 +675,7 @@ ErrorMessage big_addition(bigint** z, bigint* x, bigint* y)
 		return FAIL_NULL;
 	// alloc
 	bigint* tmp = NULL;
-	big_new(&tmp, NON_NEGATIVE, 1);
+
 	big_refine(x);
 	big_refine(y);
 	// x = 0 -> x + y = y
@@ -732,13 +732,7 @@ ErrorMessage big_additionABS(bigint** z, bigint* x, bigint* y)
 	int newWordlen = MAX(xWordlen, yWordlen);
 	newWordlen += 1;
 
-	(*z)->sign = NON_NEGATIVE;
-	(*z)->wordlen = newWordlen;
-	word* reallocWords = (word*)realloc((*z)->a, newWordlen * sizeof(word));
-	if (reallocWords == NULL)
-		return FAIL_OUT_OF_MEMORY;
-	else
-		(*z)->a = reallocWords;
+	big_new(z, NON_NEGATIVE, newWordlen);
 
 	word carryFromDown = 0;
 	word carryToUp = 0;
@@ -780,7 +774,7 @@ ErrorMessage big_substraction(bigint** z, bigint* x, bigint* y)
 		return FAIL_NULL;
 	//alloc
 	bigint* tmp = NULL;
-	big_new(&tmp, NON_NEGATIVE, 1);
+
 	big_refine(x);
 	big_refine(y);
 
@@ -855,14 +849,7 @@ ErrorMessage big_substractionABS(bigint** z, bigint* x, bigint* y)
 	int yWordlen = y->wordlen;
 	int newWordlen = MAX(xWordlen, yWordlen);
 
-	(*z)->sign = NON_NEGATIVE;
-	(*z)->wordlen = newWordlen;
-	word* reallocWords = (word*)realloc((*z)->a, newWordlen * sizeof(word));
-	if (reallocWords == NULL)
-		return FAIL_OUT_OF_MEMORY;
-	else
-		(*z)->a = reallocWords;
-
+	big_new(z, NON_NEGATIVE, newWordlen);
 
 	word borrow = 0;
 	for (int i = 0; i < newWordlen; i++)
@@ -900,7 +887,6 @@ ErrorMessage big_multiplication(bigint** z, bigint* x, bigint* y)
 		return FAIL_NULL;
 	// alloc
 	bigint* tmp = NULL;
-	big_new(&tmp, NON_NEGATIVE, 1);
 	
 	big_refine(x);
 	big_refine(y);
@@ -979,14 +965,7 @@ ErrorMessage big_multiplication(bigint** z, bigint* x, bigint* y)
 ErrorMessage big_multiplicationABS(bigint** z, bigint* x, bigint* y)
 {
 	int newWordlen = x->wordlen + y->wordlen;
-
-	(*z)->sign = NON_NEGATIVE;
-	(*z)->wordlen = newWordlen;
-	word* reallocWords = (word*)realloc((*z)->a, newWordlen * sizeof(word));
-	if (reallocWords == NULL)
-		return FAIL_OUT_OF_MEMORY;
-	else
-		(*z)->a = reallocWords;
+	big_new(z, NON_NEGATIVE, newWordlen);
 
 	big_multiplicationKaratsuba(z, x, y);
 
@@ -1004,15 +983,15 @@ ErrorMessage big_multiplicationSchoolBook(bigint** z, bigint* x, bigint* y)
 	int yWordlen = y->wordlen;
 
 	// alloc
-	bigint* tmp = NULL;
-	big_set_zero(&tmp);
+	big_set_zero(z);
 	// mul and add
+	bigint* T = NULL;
 	for (int i = 0; i < xWordlen; i++)
 	{
 		for (int j = 0; j < yWordlen; j++)
 		{
 			// T = (Aj * Bi) << w(i+j)
-			bigint* T = NULL;
+
 			big_new(&T, NON_NEGATIVE, i + j + 2);
 			word A = 0, B = 0;
 			wordMultiplication(&A, &B, xWords[i], yWords[j]);
@@ -1020,13 +999,10 @@ ErrorMessage big_multiplicationSchoolBook(bigint** z, bigint* x, bigint* y)
 			T->a[i + j] = B;
 
 			// tmp = tmp + T
-			big_addition(&tmp, tmp, T);
-
-			big_delete(&T);
+			big_addition(z, *z, T);
 		}
 	}
-	big_assign(z, tmp);
-	big_delete(&tmp);
+	big_delete(&T);
 	return SUCCESS;
 }
 ErrorMessage big_multiplicationKaratsuba(bigint** z, bigint* x, bigint* y)
@@ -1054,8 +1030,8 @@ ErrorMessage big_multiplicationKaratsuba(bigint** z, bigint* x, bigint* y)
 		bigint* T0 = NULL;
 		bigint* S1 = NULL;
 		bigint* S0 = NULL;
-		bigint* S = NULL;
 		bigint* R = NULL;
+
 		// A1, A0, B1, B0
 		big_word_right_shift(&A1, x, l);
 		big_word_reduction(&A0, x, l);
@@ -1090,18 +1066,16 @@ ErrorMessage big_multiplicationKaratsuba(bigint** z, bigint* x, bigint* y)
 		int isNegative = (S1->sign != S0->sign);
 		S0->sign = NON_NEGATIVE;
 		S1->sign = NON_NEGATIVE;
-		big_multiplicationKaratsuba(&S, S0, S1);
+		big_multiplicationKaratsuba(z, S0, S1);
 		if (isNegative)
-			S->sign = NEGATIVE;
+			(*z)->sign = NEGATIVE;
 
 		// AB = R + (S + T1 + T0)<<l
-		big_addition(&S, S, T1);
-		big_addition(&S, S, T0);
-		big_word_left_shift(&S, S, l);
-		big_addition(&S, S, R);
+		big_addition(z, *z, T1);
+		big_addition(z, *z, T0);
+		big_word_left_shift(z, *z, l);
+		big_addition(z, *z, R);
 
-		// assign
-		big_assign(z, S);
 
 		//delete
 		big_delete(&A1);
@@ -1112,7 +1086,6 @@ ErrorMessage big_multiplicationKaratsuba(bigint** z, bigint* x, bigint* y)
 		big_delete(&T0);
 		big_delete(&S1);
 		big_delete(&S0);
-		big_delete(&S);
 		big_delete(&R);
 	}
 	return SUCCESS;
@@ -1165,7 +1138,6 @@ ErrorMessage big_squaring(bigint** z, bigint* x)
 		return FAIL_NULL;
 	// alloc
 	bigint* tmp = NULL;
-	big_new(&tmp, NON_NEGATIVE, 1);
 	big_refine(x);
 
 	if (big_is_zero(x))
@@ -1189,13 +1161,16 @@ ErrorMessage big_squaringABS(bigint** z, bigint* x)
 {
 	int newWordlen = (x->wordlen) << 1;
 
+	big_new(z, NON_NEGATIVE, newWordlen);
+
+	/*
 	(*z)->sign = NON_NEGATIVE;
 	(*z)->wordlen = newWordlen;
 	word* reallocWords = (word*)realloc((*z)->a, newWordlen * sizeof(word));
 	if (reallocWords == NULL)
 		return FAIL_OUT_OF_MEMORY;
 	else
-		(*z)->a = reallocWords;
+		(*z)->a = reallocWords;*/
 
 	big_squaringKaratsuba(z, x);
 
@@ -1213,6 +1188,7 @@ ErrorMessage big_squaringSchoolBook(bigint** z, bigint* x)
 	// alloc
 	bigint* C1 = NULL;
 	bigint* C2 = NULL;
+	bigint* T = NULL;
 
 	big_new(&C1, NON_NEGATIVE, 2 * xWordlen);
 	big_set_zero(&C2);
@@ -1228,24 +1204,24 @@ ErrorMessage big_squaringSchoolBook(bigint** z, bigint* x)
 		for (int j = i + 1; j < xWordlen; j++)
 		{
 			// C2 = (AiAj) << w(i+j)
-			bigint* T = NULL;
 			big_new(&T, NON_NEGATIVE, i + j + 2);
 			word A = 0, B = 0;
 			wordMultiplication(&A, &B, xWords[i], xWords[j]);
 			T->a[i + j + 1] = A;
 			T->a[i + j] = B;
-
 			// tmp = tmp + T
 			big_addition(&C2, C2, T);
-			big_delete(&T);
+
 		}
 	}
+
 	big_bit_left_shift(&C2, C2, 1);
-	big_refine(C1);
-	big_refine(C2);
+
 	big_addition(z, C1, C2);
+
 	big_delete(&C1);
 	big_delete(&C2);
+	big_delete(&T);
 	return SUCCESS;
 }
 ErrorMessage big_squaringKaratsuba(bigint** z, bigint* x)
@@ -1300,10 +1276,7 @@ ErrorMessage big_squaringKaratsuba(bigint** z, bigint* x)
 		big_bit_left_shift(&S, S, 1);
 
 		// R = R + S
-		big_addition(&R, R, S);
-		
-		//assign
-		big_assign(z, R);
+		big_addition(z, R, S);
 
 		//delete
 		big_delete(&A1);
@@ -1326,8 +1299,6 @@ ErrorMessage big_division(bigint** q, bigint** r, bigint* x, bigint* y)
 	// alloc
 	bigint* tmpQ = NULL;
 	bigint* tmpR = NULL;
-
-	big_new(&tmpQ, NON_NEGATIVE, 1);
 
 	big_refine(x);
 	big_refine(y);
@@ -1416,23 +1387,18 @@ ErrorMessage big_divisionCore(word* q, bigint** r, bigint* x, bigint* y)
 		while (MSW >>= 1)
 			k++;
 		k = WORD_UNIT - k - 1;
-		bigint* tmpA = NULL;
-		bigint* tmpB = NULL;
-		word tmpQ = 0;
-		bigint* tmpR = NULL;
+		bigint* shiftedA = NULL;
+		bigint* shiftedB = NULL;
 
-		big_bit_left_shift(&tmpA, x, k);
-		big_bit_left_shift(&tmpB, y, k);
+		big_bit_left_shift(&shiftedA, x, k);
+		big_bit_left_shift(&shiftedB, y, k);
 
-		big_divisionCoreCore(&tmpQ, &tmpR, tmpA, tmpB);
+		big_divisionCoreCore(q, r, shiftedA, shiftedB);
 
+		big_bit_right_shift(r, *r, k);
 
-		big_bit_right_shift(r, tmpR, k);
-		*q = tmpQ;
-
-		big_delete(&tmpA);
-		big_delete(&tmpB);
-		big_delete(&tmpR);
+		big_delete(&shiftedA);
+		big_delete(&shiftedB);
 	}
 
 	return SUCCESS;

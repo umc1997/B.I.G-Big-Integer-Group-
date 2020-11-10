@@ -14,7 +14,7 @@
 
 #define karaFlag 2
 
-#define EXPMODMODE 3 // 1 = L2R, 2 = R2L, 3 = MS
+#define EXPMODMODE 1 // 1 = L2R, 2 = R2L, 3 = MS
 
 // constructor
 ErrorMessage big_new(bigint** x, int sign, int wordlen);
@@ -96,6 +96,11 @@ ErrorMessage big_word_left_shift(bigint** dst, bigint* src, int count);
 ErrorMessage big_word_right_shift(bigint** dst, bigint* src, int count);
 // reduction ( *dst = src % (word_unit^count) )
 ErrorMessage big_word_reduction(bigint** dst, bigint* src, int count);
+
+/* 
+	All functions having "ABS" in its name means this function can have NULL dst for parameter.
+	And dst and src must be different. 
+*/
 
 // addition z = x + y
 // add x and y, assign to z
