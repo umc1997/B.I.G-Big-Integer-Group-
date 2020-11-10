@@ -1,5 +1,4 @@
-//memory leak detecter 
-#include <vld.h> 
+//memory leak detecter #include <vld.h> 
 #include <stdio.h>
 #include "CoreOperation.h"
 
