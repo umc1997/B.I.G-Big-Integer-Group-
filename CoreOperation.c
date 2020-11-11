@@ -138,6 +138,7 @@ ErrorMessage big_show_hex(bigint* x) {
 		printf("%016llx", x->a[i]);
 #endif
 	}
+	printf("\n");
 	return SUCCESS;
 }
 ErrorMessage big_show_dec(bigint* x)
@@ -181,7 +182,7 @@ ErrorMessage big_show_dec(bigint* x)
 	reverseStr(output);
 
 	//output
-	printf("%s", output);
+	printf("%s\n", output);
 
 	free(output);
 	big_delete(&ten);
@@ -206,6 +207,7 @@ ErrorMessage big_show_dec_for_each_word(bigint* x) {
 		printf("%020llu:", x->a[i]);
 #endif
 	}
+	printf("\n");
 	return SUCCESS;
 }
 ErrorMessage big_show_bin(bigint* x) {
@@ -225,6 +227,7 @@ ErrorMessage big_show_bin(bigint* x) {
 			printf("%d", (int)(current >> length) & 0x1);
 		}
 	}
+	printf("\n");
 	return SUCCESS;
 }
 ErrorMessage big_refine(bigint* x) {

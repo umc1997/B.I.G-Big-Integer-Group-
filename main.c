@@ -31,6 +31,9 @@ int main()
 			//mod_exp
 			big_mod_exp(&c, a, n, b);
 
+			//show
+			showProcessHexModExp(a, n, b, c);
+
 		}
 		end = clock();
 		float dif = (float)(end - start) / CLOCKS_PER_SEC;
@@ -48,18 +51,13 @@ void showProcessHexModExp(bigint* a, bigint* n, bigint* b, bigint* c)
 {
 	printf("a = ");
 	big_show_hex(a);
-	printf("\n");
 	printf("n = ");
 	big_show_hex(n);
-	printf("\n");
 	printf("b = ");
 	big_show_hex(b);
-	printf("\n");
 	printf("c = ");
 	big_show_hex(c);
-	printf("\n");
-	printf("if pow(a, n, b) == c");
-	printf(":\n\t");
+	printf("if pow(a, n, b) == c :\n\t");
 	printf("print(\"True\")\n");
 	printf("else:\n\t");
 	printf("print(\"False\")\n");
