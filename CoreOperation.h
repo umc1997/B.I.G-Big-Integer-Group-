@@ -12,7 +12,7 @@
 #define BIGGER 1
 #define SMALLER -1
 
-#define karaFlag 3
+#define karaFlag 4
 
 #define EXPMODMODE 1 // 1 = L2R, 2 = R2L, 3 = MS
 

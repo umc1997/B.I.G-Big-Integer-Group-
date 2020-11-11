@@ -954,7 +954,7 @@ ErrorMessage big_multiplication(bigint** z, bigint* x, bigint* y)
 			big_delete(&absX);
 		}
 		// if x * y < 0 -> negative
-		if (big_get_sign(x) != big_get_sign(y))
+		if (x->sign != y->sign)
 			tmp->sign = NEGATIVE;
 		// if x * y > 0 -> non_negative
 		else
@@ -1422,8 +1422,8 @@ ErrorMessage big_divisionCoreCore(word* q, bigint** r, bigint* x, bigint* y)
 	// R = A - BQ
 	bigint* BQ = NULL;
 	big_multiplicationConst(&BQ, y, *q);
-
 	big_substraction(r, x, BQ);
+
  	// while R < 0 
 	while ((*r)->sign == NEGATIVE)
 	{
