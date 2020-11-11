@@ -761,7 +761,7 @@ ErrorMessage big_additionABS(bigint** z, bigint* x, bigint* y)
 			carryToUp = 1;
 
 		// assign
-		(*z)->a[i] = sum; //warning
+		(*z)->a[i] = sum;
 
 		carryFromDown = carryToUp;
 		carryToUp = 0;
@@ -877,7 +877,7 @@ ErrorMessage big_substractionABS(bigint** z, bigint* x, bigint* y)
 		dif = dif - yWord;
 
 		// assign
-		(*z)->a[i] = dif; //warning
+		(*z)->a[i] = dif;
 	}
 	big_refine(*z);
 

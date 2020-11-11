@@ -8,36 +8,31 @@ int main()
 {
 	srand((unsigned)time(NULL));
 
-	clock_t start, end;
 	bigint* a = NULL;
 	bigint* b = NULL;
 	bigint* n = NULL;
 	bigint* c = NULL;
+
 	int testCase = 1000;
-	int aWordlen = 10;
-	int bWordlen = 10;
+	int bit = 1024;
+	int aWordlen = bit / WORD_UNIT; // 1024 - bit
+	int bWordlen = bit / WORD_UNIT; // 1024 - bit
+
 	big_set_by_string(&n, NON_NEGATIVE, "10001", 16);
 
-	for (int i = 0; i < 5; i++) {
-		start = clock();
-		for (int t = 0; t < testCase; t++) {
-
-			//generate random big integer
-			big_gen_rand(&a, NON_NEGATIVE, aWordlen);
+	for (int t = 0; t < testCase; t++) {
+		printf("#test %d\n", t + 1);
+		//generate random big integer
+		big_gen_rand(&a, NON_NEGATIVE, aWordlen);
+		big_gen_rand(&b, NON_NEGATIVE, bWordlen);
+		while (big_is_zero(b))
 			big_gen_rand(&b, NON_NEGATIVE, bWordlen);
-			while (big_is_zero(b))
-				big_gen_rand(&b, NON_NEGATIVE, bWordlen);
 
-			//mod_exp
-			big_mod_exp(&c, a, n, b);
+		//mod_exp
+		big_mod_exp(&c, a, n, b);
 
-			//show
-			showProcessHexModExp(a, n, b, c);
-
-		}
-		end = clock();
-		float dif = (float)(end - start) / CLOCKS_PER_SEC;
-		printf("%f\n", dif / testCase);
+		//show
+		showProcessHexModExp(a, n, b, c);
 	}
 
 	big_delete(&a);
@@ -60,5 +55,5 @@ void showProcessHexModExp(bigint* a, bigint* n, bigint* b, bigint* c)
 	printf("if pow(a, n, b) == c :\n\t");
 	printf("print(\"True\")\n");
 	printf("else:\n\t");
-	printf("print(\"False\")\n");
+	printf("print(pow(a, n, b))\n");
 }	
