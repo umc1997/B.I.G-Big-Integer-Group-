@@ -355,14 +355,14 @@ bool big_is_odd(bigint* x)
 	if (x == NULL)
 		return FAIL_NULL;
 	big_refine(x);
-	return (big_get_bit(x, 0) == 1);
+	return ((x->a[0]) & 0x1);
 }
 bool big_is_even(bigint* x)
 {
 	if (x == NULL)
 		return FAIL_NULL;
 	big_refine(x);
-	return (big_get_bit(x, 0) == 0);
+	return !((x->a[0]) & 0x1);
 }
 int big_compare(bigint* x, bigint* y) {
 	if (x == NULL || y == NULL)
