@@ -1476,7 +1476,32 @@ ErrorMessage big_mod(bigint** z, bigint* x, bigint* y)
 	big_delete(&tmpR);
 	return SUCCESS;
 }
+ErrorMessage big_mod_inverse(bigint** z, bigint* x, bigint* y)
+{
+	if (x == NULL || y == NULL)
+		return FAIL_NULL;
+	big_refine(x);
+	big_refine(y);
+	// don't define y <= 0 
+	if (y->sign == NEGATIVE || big_is_zero(y))
+		return FAIL_INVALID_DIVISOR;
+	bigint* d = NULL;
+	bigint* u = NULL;
+	bigint* v = NULL;
+	big_xgcd(&d, &u, &v, x, y);
+	if (!big_is_one(d))
+		return FAIL_INVALID_DIVISOR;
 
+	if (u->sign == NEGATIVE)
+		big_addition(&u, u, y);
+	
+	big_assign(z, u);
+
+	big_delete(&d);
+	big_delete(&u);
+	big_delete(&v);
+	return SUCCESS;
+}
 ErrorMessage big_mod_exp(bigint** z, bigint* x, bigint* n, bigint* y)
 {
 	if (x == NULL || y == NULL)
@@ -1657,5 +1682,67 @@ ErrorMessage big_gcdRecursive(bigint** z, bigint* x, bigint* y)
 		big_delete(&tmp);
 	}
 
+	return SUCCESS;
+}
+
+ErrorMessage big_xgcd(bigint** d, bigint** x, bigint** y, bigint* a, bigint* b)
+{
+	if (a == NULL || b == NULL)
+		return FAIL_NULL;
+	big_refine(a);
+	big_refine(b);
+
+	bigint* tmpD = NULL;
+	bigint* tmpX = NULL;
+	bigint* tmpY = NULL;
+	big_set_zero(&tmpD);
+	big_set_zero(&tmpX);
+	big_set_zero(&tmpY);
+
+	big_xgcdRecursive(&tmpD, &tmpX, &tmpY, a, b);
+
+	big_assign(d, tmpD);
+	big_assign(x, tmpX);
+	big_assign(y, tmpY);
+	big_delete(&tmpD);
+	big_delete(&tmpX);
+	big_delete(&tmpY);
+
+	return SUCCESS;
+}
+ErrorMessage big_xgcdRecursive(bigint** d, bigint** x, bigint** y, bigint* a, bigint* b)
+{
+	if (big_is_zero(b))
+	{
+		big_assign(d, a);
+		big_set_one(x);
+		big_set_zero(y);
+	}
+	else
+	{
+		// assign
+		bigint* x0 = NULL;
+		bigint* y0 = NULL;
+		bigint* tmpR = NULL;
+		bigint* tmpQ = NULL;
+
+		big_division(&tmpQ,&tmpR, a, b);
+
+		// xgcd(d, u, v, a, b) = xgcd(d, u0, v0, b, a%b)
+		big_xgcdRecursive(d, &x0, &y0, b, tmpR);
+
+		// u = v0
+		big_assign(x, y0);
+
+		// v = u0 - v0 * (a / b)
+		big_multiplication(&tmpQ, y0, tmpQ);
+		big_substraction(y, x0, tmpQ);
+
+		// del
+		big_delete(&tmpQ);
+		big_delete(&tmpR);
+		big_delete(&x0);
+		big_delete(&y0);
+	}
 	return SUCCESS;
 }

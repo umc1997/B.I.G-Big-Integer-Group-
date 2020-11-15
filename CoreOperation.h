@@ -150,6 +150,10 @@ ErrorMessage big_divisionCoreCore(word* q, bigint** r, bigint* x, bigint* y);
 // compute modular z = x mod y (input: y > 0)
 ErrorMessage big_mod(bigint** z, bigint* x, bigint* y);
 
+// modular inverse
+// compute modular inverse z of x such that x * z = 1 (mod y) (input gcd(x, y) = 1)
+ErrorMessage big_mod_inverse(bigint** z, bigint* x, bigint* y);
+
 // modular exponentiation z = x ^ n mod y
 // compute x ^ n and modular y, assign to z (input: n >= 0 , y > 0)
 ErrorMessage big_mod_exp(bigint** z, bigint* x, bigint* n, bigint* y);
@@ -168,4 +172,9 @@ ErrorMessage big_gcd(bigint** z, bigint* x, bigint* y);
 // compute great common divisor of x and y , z = gcd(x, y) (input: x >= 0, y >= 0, z != x, z != y)
 ErrorMessage big_gcdRecursive(bigint** z, bigint* x, bigint* y);
 
+// extended euclidean algorithm
+// compute a integeral solution(x,y) of ax + by = gcd(a,b) and gcd(a,b)
+ErrorMessage big_xgcd(bigint** d, bigint** x, bigint** y, bigint* a, bigint* b);
+// compute a integeral solution(x,y) of ax + by = gcd(a,b) and gcd(a,b)
+ErrorMessage big_xgcdRecursive(bigint** d, bigint** x, bigint** y, bigint* a, bigint* b);
 #endif

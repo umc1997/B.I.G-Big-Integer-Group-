@@ -3,7 +3,7 @@
 #include <time.h>
 #include "CoreOperation.h"
 
-#define testMode 1 // Vaild answer checking = 0, Time checking = 1
+#define testMode 0 // Vaild answer checking = 0, Time checking = 1
 
 void showProcessHexModExp(bigint* a, bigint* n, bigint* b, bigint* c);
 
@@ -13,33 +13,50 @@ int main()
 
 	bigint* a = NULL;
 	bigint* b = NULL;
-	bigint* n = NULL;
-	bigint* c = NULL;
+	bigint* i = NULL;
 
-	int testCase = 1000;
-	int bit = 1024;
-	int aWordlen = bit / WORD_UNIT; // 1024 - bit
-	int bWordlen = bit / WORD_UNIT; // 1024 - bit
-
-	big_set_by_string(&n, NON_NEGATIVE, "10001", 16);
+	int testCase = 10;
+	//int bit = 1024;
+	//int aWordlen = bit / WORD_UNIT; // 1024 - bit
+	//int bWordlen = bit / WORD_UNIT; // 1024 - bit
+	int aWordlen = 2;
+	int bWordlen = 2;
+	//big_set_by_string(&n, NON_NEGATIVE, "10001", 16);
 #if testMode == 1
 	for (int i = 0; i < 5; i++) {
 		clock_t start = clock();
 #endif
+		
+		big_set_by_string(&a, NON_NEGATIVE, "10001", 16);
 		for (int t = 0; t < testCase; t++) {
-
 			/* generate random number */
-			big_gen_rand(&a, NON_NEGATIVE, aWordlen);
-			big_gen_rand(&b, NON_NEGATIVE, bWordlen);
-			while (big_is_zero(b))
-				big_gen_rand(&b, NON_NEGATIVE, bWordlen);
+			bool flag = false;
+			big_gen_rand(&b, NON_NEGATIVE, aWordlen);
+			
+
+			printf("a = ");
+			big_show_dec(a);
+			printf("b = ");
+			big_show_dec(b);
 
 			/* operation */
-			big_mod_exp(&c, a, n, b);
-			
+			big_mod_inverse(&i, a, b);
+
+			printf("inverse = ");
+			big_show_dec(i);
+
+			bigint* tmp = NULL;
+			big_multiplication(&tmp, a, i);
+			big_mod(&tmp, tmp, b);
+
+			printf("a * inverse mod b = ");
+			big_show_dec(tmp);
+
+			printf("\n");
+
 #if testMode == 0
 			/* show */
-			showProcessHexModExp(a, n, b, c);
+			
 #endif
 		}
 #if testMode == 1
@@ -50,8 +67,7 @@ int main()
 #endif
 	big_delete(&a);
 	big_delete(&b);
-	big_delete(&c);
-	big_delete(&n);
+	big_delete(&i);
 	return 0;
 }
 void showProcessHexModExp(bigint* a, bigint* n, bigint* b, bigint* c)
