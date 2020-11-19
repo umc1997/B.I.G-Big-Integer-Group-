@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <time.h>
 #include "CoreOperation.h"
-#define testMode 0 // Vaild answer checking = 0, Time checking = 1
+#define testMode 1 // Vaild answer checking = 0, Time checking = 1
 
 void showProcessHex(bigint* a, bigint* b, bigint* c);
 
@@ -14,25 +14,23 @@ int main()
 	bigint* b = NULL;
 	bigint* c = NULL;
 
-	int testCase = 100;
+	int testCase = 1000;
 	int bit = 1024;
 	int aWordlen = bit / WORD_UNIT; // 1024 - bit
 	int bWordlen = bit / WORD_UNIT; // 1024 - bit
 
-	big_set_by_string(&b, NON_NEGATIVE, "10001", 16);
 
 #if testMode == 1
 	for (int i = 0; i < 5; i++) {
 		clock_t start = clock();
 #endif
-		
 		for (int t = 0; t < testCase; t++) {
 			/* generate random number */
 			big_gen_rand(&a, NON_NEGATIVE, aWordlen);
-			//big_gen_rand(&b, NON_NEGATIVE, bWordlen);
+			big_gen_rand(&b, NON_NEGATIVE, bWordlen);
 			
 			/* operation */
-			big_mod_inverse(&c, a, b);
+			// do nothing
 			
 #if testMode == 0
 			/* show */
@@ -42,7 +40,9 @@ int main()
 #if testMode == 1
 		clock_t end = clock();
 		float dif = (float)(end - start) / CLOCKS_PER_SEC;
-		printf("%f\n", dif  / testCase);
+		dif /= testCase;
+		dif *= 10000;
+		printf("%.5f\n", dif);
 	}
 #endif
 	big_delete(&a);
