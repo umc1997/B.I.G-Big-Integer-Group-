@@ -12,6 +12,8 @@
 *.gitattributes
 *.exe
 *.py
+html
+latex
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
