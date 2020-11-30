@@ -1,7 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define WORD_UNIT 8 //8 32 64
+#define WORD_UNIT 64 //8 32 64
 
 #define karaFlag 4 //1 ~ 
 

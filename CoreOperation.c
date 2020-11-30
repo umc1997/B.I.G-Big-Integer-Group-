@@ -1236,25 +1236,40 @@ static ErrorMessage big_multiplicationSchoolBook(bigint** z, bigint* x, bigint* 
 
 	// alloc
 	big_set_zero(z);
+
 	// mul and add
-	bigint* T = NULL;
+	bigint* T0 = NULL;
+	bigint* T1 = NULL;
 	for (int i = 0; i < xWordlen; i++)
 	{
+		word currentWord = x->a[i];
+		// T0 = Ai * B0 || Ai * B2 || Ai * B4 || ...
+		// T1 = Ai * B1 || Ai * B3 || Ai * B5 || ...
+		big_new(&T0, NON_NEGATIVE, yWordlen + i + 2);
+		big_new(&T1, NON_NEGATIVE, yWordlen + i + 2);
 		for (int j = 0; j < yWordlen; j++)
 		{
-			// T = (Aj * Bi) << w(i+j)
-
-			big_new(&T, NON_NEGATIVE, i + j + 2);
 			word A = 0, B = 0;
-			wordMultiplication(&A, &B, xWords[i], yWords[j]);
-			T->a[i + j + 1] = A;
-			T->a[i + j] = B;
-
-			// tmp = tmp + T
-			big_addition(z, *z, T);
+			wordMultiplication(&A, &B, currentWord, yWords[j]);
+			if (j % 2 == 0)
+			{
+				T0->a[i + j + 1] = A;
+				T0->a[i + j] = B;
+			}
+			else
+			{
+				T1->a[i + j + 1] = A;
+				T1->a[i + j] = B;
+			}
 		}
+		big_addition(z, *z, T0);
+		big_addition(z, *z, T1);
 	}
-	big_delete(&T);
+	big_refine(*z);
+
+	big_delete(&T0);
+	big_delete(&T1);
+	
 	return SUCCESS;
 }
 // static function
@@ -1273,6 +1288,7 @@ static ErrorMessage big_multiplicationKaratsuba(bigint** z, bigint* x, bigint* y
 	{
 		// calculate shift bit
 		int l = MAX(xWordlen, yWordlen);
+		l++;
 		l = l >> 1;
 		// init
 		bigint* A1 = NULL;
@@ -1296,8 +1312,9 @@ static ErrorMessage big_multiplicationKaratsuba(bigint** z, bigint* x, bigint* y
 		big_multiplicationKaratsuba(&T0, A0, B0);
 
 		// R = T1 << 2l + T0
-		big_new(&R, NON_NEGATIVE, T1->wordlen + 2 * l);
-		for (int i = 0; i < T1->wordlen + 2 * l; i++)
+		int rWordlen = T1->wordlen + 2 * l;
+		big_new(&R, NON_NEGATIVE, rWordlen);
+		for (int i = 0; i < rWordlen; i++)
 		{
 			if (i < 2 * l) 
 			{
@@ -1328,7 +1345,6 @@ static ErrorMessage big_multiplicationKaratsuba(bigint** z, bigint* x, bigint* y
 		big_addition(z, *z, T0);
 		big_word_left_shift(z, *z, l);
 		big_addition(z, *z, R);
-
 
 		//delete
 		big_delete(&A1);
@@ -1498,8 +1514,8 @@ static ErrorMessage big_squaringKaratsuba(bigint** z, bigint* x)
 	else
 	{
 		// calculate shift bit
-		int l = xWordlen >> 1;
-
+		int l = (xWordlen + 1) >> 1;
+		
 		//alloc
 		bigint* A1 = NULL;
 		bigint* A0 = NULL;
@@ -1517,8 +1533,9 @@ static ErrorMessage big_squaringKaratsuba(bigint** z, bigint* x)
 		big_squaringKaratsuba(&T0, A0);
 
 		// R = T1 << 2l + T0
-		big_new(&R, NON_NEGATIVE, T1->wordlen + 2 * l);
-		for (int i = 0; i < T1->wordlen + 2 * l; i++)
+		int rWordlen = T1->wordlen + 2 * l;
+		big_new(&R, NON_NEGATIVE, rWordlen);
+		for (int i = 0; i < rWordlen; i++)
 		{
 			if (i < 2 * l)
 			{
