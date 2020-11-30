@@ -6,6 +6,9 @@
 #define NON_NEGATIVE 0
 #define NEGATIVE 1
 
+#define EQUAL 0
+#define BIGGER 1
+#define SMALLER -1
 
 #if WORD_UNIT == 8 
 #define word unsigned char

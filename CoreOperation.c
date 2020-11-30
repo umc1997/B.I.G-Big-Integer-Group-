@@ -2,6 +2,7 @@
 
 /* prototype */
 static int big_compareABS(bigint* x, bigint* y);
+static ErrorMessage big_refine(bigint* x);
 static ErrorMessage big_additionABS(bigint** z, bigint* x, bigint* y);
 static ErrorMessage big_substractionABS(bigint** z, bigint* x, bigint* y);
 static ErrorMessage big_multiplicationABS(bigint** z, bigint* x, bigint* y);
@@ -307,13 +308,8 @@ ErrorMessage big_show_bin(bigint* x) {
 	printf("\n");
 	return SUCCESS;
 }
-/**
- * erase useless 0 in front of big int.
- * 
- * \param x : bigint (can't be NULL)
- * \return : ErrorMessage
- */
-ErrorMessage big_refine(bigint* x) {
+// static function
+static ErrorMessage big_refine(bigint* x) {
 	if (x == NULL)
 		return FAIL_NULL;
 	int newWordlen = x->wordlen;

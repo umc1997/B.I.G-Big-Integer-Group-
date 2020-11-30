@@ -9,10 +9,6 @@
 #include <string.h>
 #include <math.h>
 
-#define EQUAL 0
-#define BIGGER 1
-#define SMALLER -1
-
 // constructor
 ErrorMessage big_new(bigint** x, int sign, int wordlen);
 
@@ -43,9 +39,6 @@ ErrorMessage big_show_hex(bigint* x);
 ErrorMessage big_show_dec(bigint* x);
 ErrorMessage big_show_dec_for_each_word(bigint* x);
 ErrorMessage big_show_bin(bigint* x);
-
-// erase useless 0 words in front of bigint 
-ErrorMessage big_refine(bigint* x);
 
 // assign src bigint to dst bigint
 ErrorMessage big_assign(bigint** dst, bigint* src);
