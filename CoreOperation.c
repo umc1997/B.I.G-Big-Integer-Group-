@@ -1,4 +1,26 @@
 #include "CoreOperation.h"
+
+/* prototype */
+static int big_compareABS(bigint* x, bigint* y);
+static ErrorMessage big_additionABS(bigint** z, bigint* x, bigint* y);
+static ErrorMessage big_substractionABS(bigint** z, bigint* x, bigint* y);
+static ErrorMessage big_multiplicationABS(bigint** z, bigint* x, bigint* y);
+static ErrorMessage big_multiplicationSchoolBook(bigint** z, bigint* x, bigint* y);
+static ErrorMessage big_multiplicationKaratsuba(bigint** z, bigint* x, bigint* y);
+static ErrorMessage big_squaringABS(bigint** z, bigint* x);
+static ErrorMessage big_squaringSchoolBook(bigint** z, bigint* x);
+static ErrorMessage big_squaringKaratsuba(bigint** z, bigint* x);
+static ErrorMessage big_divisionABS(bigint** q, bigint** r, bigint* x, bigint* y);
+static ErrorMessage big_divisionCore(word* q, bigint** r, bigint* x, bigint* y);
+static ErrorMessage big_divisionCoreCore(word* q, bigint** r, bigint* x, bigint* y);
+static ErrorMessage big_mod_expABS(bigint** z, bigint* x, bigint* n, bigint* y);
+static ErrorMessage big_mod_expL2R(bigint** z, bigint* x, bigint* n, bigint* y);
+static ErrorMessage big_mod_expR2L(bigint** z, bigint* x, bigint* n, bigint* y);
+static ErrorMessage big_mod_expMS(bigint** z, bigint* x, bigint* n, bigint* y);
+static ErrorMessage big_gcdRecursive(bigint** z, bigint* x, bigint* y);
+static ErrorMessage big_xgcdRecursive(bigint** d, bigint** x, bigint** y, bigint* a, bigint* b);
+/* prototype */
+
 /**
  * construct a bigint.
  * 
@@ -565,13 +587,8 @@ int big_compare(bigint* x, bigint* y) {
 			return SMALLER;
 	}
 }
-/**
- * return the comparison between two positive bigints.
- * only use for big_compare function
- * \param x : one bigint (can't be NULL)
- * \param y : the other bigint (can't be NULL)
- * \return : comparison of two positive bigints (1 = x is bigger, 0 = two numbers are equal, -1 = y is bigger)
- */
+
+// static function
 static int big_compareABS(bigint* x, bigint* y)
 {
 	int xWordlen = x->wordlen;
@@ -943,14 +960,7 @@ ErrorMessage big_addition(bigint** z, bigint* x, bigint* y)
 	big_delete(&tmp);
 	return SUCCESS;
 }
-/**
- * addition x + y = z.
- * only use for big_addtion and big_substraction function
- * \param z : address of bigint z (can be NULL) (!= x, y)
- * \param x : one bigint (can't be NULL) (x > 0)
- * \param y : another bigint (can't be NULL) (y > 0)
- * \return : ErrorMessage
- */
+// static function
 static ErrorMessage big_additionABS(bigint** z, bigint* x, bigint* y)
 {
 	word* xWords = x->a;
@@ -1077,14 +1087,7 @@ ErrorMessage big_substraction(bigint** z, bigint* x, bigint* y)
 	big_delete(&tmp);
 	return SUCCESS;
 }
-/**
- * substraction x - y = z .
- * only use for big_substraction function
- * \param z : address of bigint z (can be NULL) (!= x, y)
- * \param x : one bigint (can't be NULL) (x > y)
- * \param y : another bigint (can't be NULL) (y > 0)
- * \return : ErrorMessage
- */
+// static function
 static ErrorMessage big_substractionABS(bigint** z, bigint* x, bigint* y)
 {
 	word* xWords = x->a;
@@ -1213,14 +1216,7 @@ ErrorMessage big_multiplication(bigint** z, bigint* x, bigint* y)
 	return SUCCESS;
 
 }
-/**
- * multiplication x * y = z.
- * only use for big_multiplication function
- * \param z : address of bigint z (can be NULL) (!= x, y)
- * \param x : one bigint (can't be NULL) (x > 0)
- * \param y : another bigint (can't be NULL) (y > 0)
- * \return : ErrorMessage
- */
+// static function
 static ErrorMessage big_multiplicationABS(bigint** z, bigint* x, bigint* y)
 {
 	int newWordlen = x->wordlen + y->wordlen;
@@ -1231,14 +1227,7 @@ static ErrorMessage big_multiplicationABS(bigint** z, bigint* x, bigint* y)
 	big_refine(*z);
 	return SUCCESS;
 }
-/**
- * schoolbook multiplication x * y = z. 
- * only use for big_multiplicationKaratsuba function
- * \param z : address of bigint z (can be NULL) (!= x, y)
- * \param x : one bigint (can't be NULL) (x > 0)
- * \param y : another bigint (can't be NULL) (y > 0)
- * \return : ErrorMessage
- */
+// static function
 static ErrorMessage big_multiplicationSchoolBook(bigint** z, bigint* x, bigint* y)
 {
 	if (x == NULL || y == NULL)
@@ -1272,14 +1261,7 @@ static ErrorMessage big_multiplicationSchoolBook(bigint** z, bigint* x, bigint* 
 	big_delete(&T);
 	return SUCCESS;
 }
-/**
- * karatsuba multiplication x * y = z.
- * only use for big_multiplicationABS, big_multiplicationKaratsuba and big_squaringKaratsuba function
- * \param z : address of bigint z (can be NULL) (!= x, y)
- * \param x : one bigint (can't be NULL) (x > 0)
- * \param y : another bigint (can't be NULL)(y > 0)
- * \return : ErrorMessage
- */
+// static function
 static ErrorMessage big_multiplicationKaratsuba(bigint** z, bigint* x, bigint* y)
 {
 	if (x == NULL || y == NULL)
@@ -1338,7 +1320,7 @@ static ErrorMessage big_multiplicationKaratsuba(bigint** z, bigint* x, bigint* y
 		big_substraction(&S0, B1, B0);
 
 		// S = S1 * S0
-		int isNegative = (S1->sign != S0->sign);
+		bool isNegative = (S1->sign != S0->sign);
 		S0->sign = NON_NEGATIVE;
 		S1->sign = NON_NEGATIVE;
 		big_multiplicationKaratsuba(z, S0, S1);
@@ -1447,13 +1429,7 @@ ErrorMessage big_squaring(bigint** z, bigint* x)
 	big_delete(&tmp);
 	return SUCCESS;
 }
-/**
- * squaring z = x * x.
- * only use for big_squaring function
- * \param z : address of bigint z (can be NULL) (!= x)
- * \param x : bigint (can't be NULL)
- * \return : ErrorMessage
- */
+// static function
 static ErrorMessage big_squaringABS(bigint** z, bigint* x)
 {
 	int newWordlen = (x->wordlen) << 1;
@@ -1465,13 +1441,7 @@ static ErrorMessage big_squaringABS(bigint** z, bigint* x)
 	big_refine(*z);
 	return SUCCESS;
 }
-/**
- * schoolbook squaring z = x * x.
- * only use for big_squaringKaratsuba function
- * \param z : address of bigint z (can be NULL) (!= x)
- * \param x : bigint (can't be NULL)
- * \return : ErrorMessage
- */
+// static function
 static ErrorMessage big_squaringSchoolBook(bigint** z, bigint* x)
 {
 	if (x == NULL)
@@ -1519,13 +1489,7 @@ static ErrorMessage big_squaringSchoolBook(bigint** z, bigint* x)
 	big_delete(&T);
 	return SUCCESS;
 }
-/**
- * karatsuba squaring z = x * x.
- * only use for big_squaringKaratsuba and big_squaringABS function
- * \param z : address of bigint z (can be NULL) (!= x)
- * \param x : bigint (can't be NULL)
- * \return : ErrorMessage
- */
+// static function
 static ErrorMessage big_squaringKaratsuba(bigint** z, bigint* x)
 {
 	if (x == NULL)
@@ -1652,15 +1616,7 @@ ErrorMessage big_division(bigint** q, bigint** r, bigint* x, bigint* y)
 	big_delete(&tmpR);
 	return SUCCESS;
 }
-/**
- * division x = y * q + r (0 <= r < y) .
- * only use for big_division function
- * \param q : address of bigint q (can be NULL) (!= x, y)
- * \param r : address of bigint r (can be NULL) (!= x, y)
- * \param x : bigint x (can't be NULL) (x > y > 0)
- * \param y : bigint y (can't be NULL) (y > 0)
- * \return : ErrorMessage
- */
+// static function
 static ErrorMessage big_divisionABS(bigint** q, bigint** r, bigint* x, bigint* y)
 {
 	// alloc
@@ -1689,15 +1645,7 @@ static ErrorMessage big_divisionABS(bigint** q, bigint** r, bigint* x, bigint* y
 	big_refine(*r);
 	return SUCCESS;
 }
-/**
- * division x = y * q + r (0 <= r < y).
- * only use of big_divisionABS function
- * \param q : address of word q
- * \param r : address of bigint r (can be NULL) (!= x, y)
- * \param x : bigint x (can't be NULL) (0 < y <= x < y * W)
- * \param y : bigint y (can't be NULL) (0 < y <= x < y * W)
- * \return : ErrorMessage
- */
+// static function
 static ErrorMessage big_divisionCore(word* q, bigint** r, bigint* x, bigint* y)
 {
 	if (x == NULL || y == NULL)
@@ -1732,15 +1680,7 @@ static ErrorMessage big_divisionCore(word* q, bigint** r, bigint* x, bigint* y)
 
 	return SUCCESS;
 }
-/**
- * division x = y * q + r (0 <= r < y).
- * only use of big_divisionCore function
- * \param q : address of word q
- * \param r : address of bigint r (can be NULL) (!= x, y)
- * \param x : bigint x (can't be NULL) (0 < y <= x < y * W)
- * \param y : bigint y (can't be NULL) (0 < y <= x < y * W)
- * \return : ErrorMessage
- */
+// static function
 static ErrorMessage big_divisionCoreCore(word* q, bigint** r, bigint* x, bigint* y)
 {
 	if (x == NULL || y == NULL)
@@ -1909,15 +1849,7 @@ ErrorMessage big_mod_exp(bigint** z, bigint* x, bigint* n, bigint* y)
 
 	return SUCCESS;
 }
-/**
- * modular exponentiation x ^ n mod y = z.
- * only use for big_mod_exp function
- * \param z : address of bigint z (can be NULL)
- * \param x : bigint x (can't be NULL) (x > 0)
- * \param n : bigint n (can't be NULL) (n >= 0)
- * \param y : bigint y (can't be NULL) (y > 0)
- * \return : ErrorMessage
- */
+// static function
 static ErrorMessage big_mod_expABS(bigint** z, bigint* x, bigint* n, bigint* y)
 {
 	// x = x mod y
@@ -1936,15 +1868,7 @@ static ErrorMessage big_mod_expABS(bigint** z, bigint* x, bigint* n, bigint* y)
 	big_refine(*z);
 	return SUCCESS;
 }
-/**
- * modular exponentiation using left-to-right algorithm x ^ n mod y = z.
- * only use for big_mod_expABS function
- * \param z : address of bigint z (can be NULL)
- * \param x : bigint x (can't be NULL) (x > 0)
- * \param n : bigint n (can't be NULL) (n >= 0)
- * \param y : bigint y (can't be NULL) (y > 0)
- * \return : ErrorMessage
- */
+// static function
 static ErrorMessage big_mod_expL2R(bigint** z, bigint* x, bigint* n, bigint* y)
 {
 	int nWordlen = n->wordlen;
@@ -1972,15 +1896,7 @@ static ErrorMessage big_mod_expL2R(bigint** z, bigint* x, bigint* n, bigint* y)
 	}
 	return SUCCESS;
 }
-/**
- * modular exponentiation using right-to-left algorithm x ^ n mod y = z.
- * only use for big_mod_expABS function
- * \param z : address of bigint z (can be NULL)
- * \param x : bigint x (can't be NULL) (x > 0)
- * \param n : bigint n (can't be NULL) (n >= 0)
- * \param y : bigint y (can't be NULL) (y > 0)
- * \return : ErrorMessage
- */
+// static function
 static ErrorMessage big_mod_expR2L(bigint** z, bigint* x, bigint* n, bigint* y)
 {
 	bigint* t1 = NULL;
@@ -2013,15 +1929,7 @@ static ErrorMessage big_mod_expR2L(bigint** z, bigint* x, bigint* n, bigint* y)
 	big_delete(&t1);
 	return SUCCESS;
 }
-/**
- * modular exponentiation using multiply-and-squaring algorithm x ^ n mod y = z.
- * only use for big_mod_expABS function
- * \param z : address of bigint z (can be NULL)
- * \param x : bigint x (can't be NULL) (x > 0)
- * \param n : bigint n (can't be NULL) (n >= 0)
- * \param y : bigint y (can't be NULL) (y > 0)
- * \return : ErrorMessage
- */
+// static function
 static ErrorMessage big_mod_expMS(bigint** z, bigint* x, bigint* n, bigint* y)
 {
 	bigint* t1 = NULL;
@@ -2083,14 +1991,7 @@ ErrorMessage big_gcd(bigint** z, bigint* x, bigint* y)
 
 	return SUCCESS;
 }
-/**
- * greatest common divisor recursive : gcd(x, y) = z.
- * only use for big_gcd and big_gcdRecursive fuction
- * \param z : address of bigint z (can be NULL) (!= x, y)
- * \param x : bigint x (can't be NULL) (x >= 0)
- * \param y : bigint y (can't be NULL) (y >= 0)
- * \return : ErrorMessage
- */
+// static function
 static ErrorMessage big_gcdRecursive(bigint** z, bigint* x, bigint* y)
 {
 	if (big_is_zero(y))
@@ -2146,16 +2047,7 @@ ErrorMessage big_xgcd(bigint** d, bigint** x, bigint** y, bigint* a, bigint* b)
 
 	return SUCCESS;
 }
-/**
- * extended euclidean algorhitm recursive: compute a integeral solution(x,y) of ax + by = gcd(a,b) and gcd(a,b).
- * only use for big_xgcd fuction and big_xgcdRecursive function
- * \param d : address of bigint gcd(a, b) (can be NULL)
- * \param x : address of bigint x (can be NULL) (!= a, b)
- * \param y : address of bigint y (can be NULL) (!= a, b)
- * \param a : bigint a (can't be NULL) (a >= 0)
- * \param b : bigint b (can't be NULL) (b >= 0)
- * \return ErrorMessage
- */
+// static function
 static ErrorMessage big_xgcdRecursive(bigint** d, bigint** x, bigint** y, bigint* a, bigint* b)
 {
 	if (big_is_zero(b))

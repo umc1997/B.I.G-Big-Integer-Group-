@@ -3,6 +3,7 @@
 #include "BigInt.h"
 #include "ErrorMessage.h"
 #include "BasicOperation.h"
+#include "config.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -11,10 +12,6 @@
 #define EQUAL 0
 #define BIGGER 1
 #define SMALLER -1
-
-#define karaFlag 4
-
-#define EXPMODMODE 1 // 1 = L2R, 2 = R2L, 3 = MS
 
 // constructor
 ErrorMessage big_new(bigint** x, int sign, int wordlen);
@@ -61,7 +58,6 @@ ErrorMessage big_flip_sign(bigint** x);
 
 // compare x with y (1 = x is bigger, 0 = two numbers are equal, -1 = y is bigger)
 int big_compare(bigint* x, bigint* y);
-static int big_compareABS(bigint* x, bigint* y);
 
 // shift & reduction operation
 ErrorMessage big_bit_left_shift(bigint** dst, bigint* src, int count);
@@ -71,51 +67,35 @@ ErrorMessage big_word_left_shift(bigint** dst, bigint* src, int count);
 ErrorMessage big_word_right_shift(bigint** dst, bigint* src, int count);
 ErrorMessage big_word_reduction(bigint** dst, bigint* src, int count);
 
-// addition z = x + y
+// addition : z = x + y
 ErrorMessage big_addition(bigint** z, bigint* x, bigint* y);
-static ErrorMessage big_additionABS(bigint** z, bigint* x, bigint* y);
 
-// substraction z = x - y
+// substraction : z = x - y
 ErrorMessage big_substraction(bigint** z, bigint* x, bigint* y);
-static ErrorMessage big_substractionABS(bigint** z, bigint* x, bigint* y);
 
-// multiplication z = x * y
+// multiplication : z = x * y
 ErrorMessage big_multiplication(bigint** z, bigint* x, bigint* y);
-static ErrorMessage big_multiplicationABS(bigint** z, bigint* x, bigint* y);
-static ErrorMessage big_multiplicationSchoolBook(bigint** z, bigint* x, bigint* y);
-static ErrorMessage big_multiplicationKaratsuba(bigint** z, bigint* x, bigint* y);
 ErrorMessage big_multiplicationConst(bigint** z, bigint* x, word y);
 
-// squaring z = x * x
+// squaring : z = x * x
 ErrorMessage big_squaring(bigint** z, bigint* x);
-static ErrorMessage big_squaringABS(bigint** z, bigint* x);
-static ErrorMessage big_squaringSchoolBook(bigint** z, bigint* x);
-static ErrorMessage big_squaringKaratsuba(bigint** z, bigint* x);
 
-// division x = y * q + r (0 <= r < y)
+// division : find q and r such that x = y * q + r (0 <= r < y)
 ErrorMessage big_division(bigint** q, bigint** r, bigint* x, bigint* y);
-static ErrorMessage big_divisionABS(bigint** q, bigint** r, bigint* x, bigint* y);
-static ErrorMessage big_divisionCore(word* q, bigint** r, bigint* x, bigint* y);
-static ErrorMessage big_divisionCoreCore(word* q, bigint** r, bigint* x, bigint* y);
 
-// modular z = x mod y
+// modular : z = x mod y
 ErrorMessage big_mod(bigint** z, bigint* x, bigint* y);
 
-// modular inverse
+// modular inverse : find z such that x * z mod y = 1 for prime number y
 ErrorMessage big_mod_inverse(bigint** z, bigint* x, bigint* y);
 
-// modular exponentiation z = x ^ n mod y
+// modular exponentiation : z = x ^ n mod y
 ErrorMessage big_mod_exp(bigint** z, bigint* x, bigint* n, bigint* y);
-static ErrorMessage big_mod_expABS(bigint** z, bigint* x, bigint* n, bigint* y);
-static ErrorMessage big_mod_expL2R(bigint** z, bigint* x, bigint* n, bigint* y);
-static ErrorMessage big_mod_expR2L(bigint** z, bigint* x, bigint* n, bigint* y);
-static ErrorMessage big_mod_expMS(bigint** z, bigint* x, bigint* n, bigint* y);
 
-// great common divisor of x and y , z = gcd(x, y)
+// great common divisor : z = gcd(x, y)
 ErrorMessage big_gcd(bigint** z, bigint* x, bigint* y);
-static ErrorMessage big_gcdRecursive(bigint** z, bigint* x, bigint* y);
 
-// extended euclidean algorithm
+// extended euclidean algorithm : find x, y, d such that ax + by = d = gcd(a, b)
 ErrorMessage big_xgcd(bigint** d, bigint** x, bigint** y, bigint* a, bigint* b);
-static ErrorMessage big_xgcdRecursive(bigint** d, bigint** x, bigint** y, bigint* a, bigint* b);
+
 #endif

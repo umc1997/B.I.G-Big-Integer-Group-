@@ -1,7 +1,8 @@
 #ifndef BIGINT_H
 #define BIGINT_H
 
-#define WORD_UNIT 64 //8 32 64
+#include "config.h"
+
 #define NON_NEGATIVE 0
 #define NEGATIVE 1
 

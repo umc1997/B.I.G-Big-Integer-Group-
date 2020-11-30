@@ -15,11 +15,11 @@ int main()
 	bigint* c = NULL;
 	bigint* n = NULL;
 
-	int testCase = 1000;
+	int testCase = 100;
 	int bit = 1024;
 	int aWordlen = bit / WORD_UNIT; // 1024 - bit
 	int bWordlen = bit / WORD_UNIT; // 1024 - bit
-	int nWordlen = bit / WORD_UNIT; // 1024 - bit
+	//int nWordlen = bit / WORD_UNIT; // 1024 - bit
 
 #if testMode == 1
 	for (int i = 0; i < 5; i++) {
@@ -28,24 +28,29 @@ int main()
 		for (int t = 0; t < testCase; t++) {
 			/* generate random number */
 			big_gen_rand(&a, NON_NEGATIVE, aWordlen);
-			//do
+		//	do
 			//{
-			big_gen_rand(&b, NON_NEGATIVE, bWordlen);
+				big_gen_rand(&b, NON_NEGATIVE, bWordlen);
 			//} while (big_is_zero(b));
 			//big_gen_rand(&n, NON_NEGATIVE, nWordlen);
-			
-			/* operation */
-			//big_mod_exp(&c, a, n, b);
-			
-#if testMode == 0
-			/* show */
-			//showProcessHex(a, b, c);
+
+#if testMode == 0 
 			printf("a = ");
 			big_show_hex(a);
 			printf("b = ");
 			big_show_hex(b);
-			printf("n = ");
-			big_show_hex(n);
+			//printf("n = ");
+			//big_show_hex(n);
+#endif
+
+			/* operation */
+			//big_mod_exp(&c, a, n, b);
+			big_multiplication(&c, a, b);
+			
+#if testMode == 0
+			/* show */
+			//showProcessHex(a, b, c);
+		
 			printf("c = ");
 			big_show_hex(c);
 			printf("if pow(a,n,b) == c :\n\t");
@@ -66,6 +71,7 @@ int main()
 	big_delete(&b);
 	big_delete(&c);
 	big_delete(&n);
+	
 	return 0;
 }
 void showProcessHex(bigint* a, bigint* b, bigint* c)
