@@ -19,15 +19,14 @@ int main()
 	int aWordlen = bit / WORD_UNIT; // 1024 - bit
 	int bWordlen = bit / WORD_UNIT; // 1024 - bit
 	int nWordlen = bit / WORD_UNIT; // 1024 - bit
-	int aSign = 0;
-	int bSign = 0;
+	int aSign = NON_NEGATIVE;
+	int bSign = NON_NEGATIVE;
 	int nSign = NON_NEGATIVE;
-	aSign = NON_NEGATIVE;//rand() % 2;
-	bSign = NON_NEGATIVE;//rand() % 2;
+	//aSign = rand() % 2;
+	//bSign = rand() % 2;
 	big_gen_rand(&a, aSign, aWordlen);
 	big_gen_rand(&b, bSign, bWordlen);
 	big_gen_rand(&n, nSign, nWordlen);
-
 
 #if testMode == 1
 	for (int i = 0; i < 5; i++) {
@@ -35,7 +34,7 @@ int main()
 #endif
 		for (int t = 0; t < testCase; t++) {
 			/* generate random number */
-			
+
 #if testMode == 0 
 			printf("a = ");
 			big_show_hex(a);
@@ -49,11 +48,11 @@ int main()
 			//big_mod_exp(&c, a, n, b);
 			big_multiplication(&c, a, b);
 			//big_squaring(&c, a);
-			
+
 #if testMode == 0
 			/* show */
 			//showProcessHex(a, b, c);
-		
+
 			printf("c = ");
 			big_show_hex(c);
 			printf("if a * b == c :\n\t");
@@ -74,6 +73,6 @@ int main()
 	big_delete(&b);
 	big_delete(&c);
 	big_delete(&n);
-	
+
 	return 0;
 }

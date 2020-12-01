@@ -166,7 +166,7 @@ ErrorMessage wordLongDivision(word* Q, word A1, word A0, word B)
 	*Q = 0;
 	word R = A1;
 	int w = WORD_UNIT;
-	
+
 	for (int i = w - 1; i >= 0; i--)
 	{
 		if (R >= ((word)1 << (w - 1)))

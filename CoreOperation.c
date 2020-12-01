@@ -24,7 +24,7 @@ static ErrorMessage big_xgcdRecursive(bigint** d, bigint** x, bigint** y, bigint
 
 /**
  * construct a bigint.
- * 
+ *
  * \param x : address of bigint (can be NULL)
  * \param sign : sign of bigint (NON_NEGATIVE = 0, NEGATIVE = 1)
  * \param wordlen : word length of bigint (int type)
@@ -43,9 +43,9 @@ ErrorMessage big_new(bigint** x, int sign, int wordlen) {
 }
 /**
  * delete the bigint.
- * 
+ *
  * \param x : address of bigint (can be NULL)
- * \return : ErrorMessage 
+ * \return : ErrorMessage
  */
 ErrorMessage big_delete(bigint** x) {
 	if (*x == NULL)
@@ -60,7 +60,7 @@ ErrorMessage big_delete(bigint** x) {
 }
 /**
  * set bigint by word array.
- * 
+ *
  * \param x : address of bigint (can be NULL)
  * \param sign : sign of bigint (NON_NEGATIVE = 0, NEGATIVE = 1)
  * \param a : pointer of word array
@@ -76,7 +76,7 @@ ErrorMessage big_set_by_array(bigint** x, int sign, word* a, int wordlen) {
 }
 /**
  * set bigint by string.
- * 
+ *
  * \param x : address of bigint (can be NULL)
  * \param sign : sign of bigint (NON_NEGATIVE = 0, NEGATIVE = 1)
  * \param str : pointer of string
@@ -110,7 +110,7 @@ ErrorMessage big_set_by_string(bigint** x, int sign, char* str, int base) {
 			big_set_by_array(&tmp, NON_NEGATIVE, currentDigit, 1);
 			// add
 			big_addition(x, *x, tmp);
-			
+
 			big_delete(&tmp);
 		}
 		(*x)->sign = sign;
@@ -118,35 +118,35 @@ ErrorMessage big_set_by_string(bigint** x, int sign, char* str, int base) {
 	else {
 		if (base == 2)
 		{
-	#if WORD_UNIT==8
+#if WORD_UNIT==8
 			cnt = strLen >> 3;
 			if (strLen != cnt << 3)
 				cnt++;
-	#elif WORD_UNIT==32
+#elif WORD_UNIT==32
 			cnt = strLen >> 5;
 			if (strLen != cnt << 5)
 				cnt++;
-	#elif WORD_UNIT==64
+#elif WORD_UNIT==64
 			cnt = strLen >> 6;
 			if (strLen != cnt << 6)
 				cnt++;
-	#endif
+#endif
 		}
 		else if (base == 16)
 		{
-	#if WORD_UNIT==8
+#if WORD_UNIT==8
 			cnt = strLen >> 1;
 			if (strLen != cnt << 1)
 				cnt++;
-	#elif WORD_UNIT==32
+#elif WORD_UNIT==32
 			cnt = strLen >> 3;
 			if (strLen != cnt << 3)
 				cnt++;
-	#elif WORD_UNIT==64
+#elif WORD_UNIT==64
 			cnt = strLen >> 4;
 			if (strLen != cnt << 4)
 				cnt++;
-	#endif
+#endif
 		}
 
 		// alloc
@@ -170,13 +170,13 @@ ErrorMessage big_set_by_string(bigint** x, int sign, char* str, int base) {
 			}
 		}
 	}
-	
+
 	big_refine(*x);
 	return SUCCESS;
 }
 /**
  * show bigint by hexadecimal.
- * 
+ *
  * \param x : address of bigint (can't be NULL)
  * \return : ErrorMessage
  */
@@ -322,7 +322,7 @@ static ErrorMessage big_refine(bigint* x) {
 	if (x->wordlen != newWordlen)
 	{
 		x->wordlen = newWordlen;
-		word *reallocWords = (word*)realloc(x->a, sizeof(word) * newWordlen);
+		word* reallocWords = (word*)realloc(x->a, sizeof(word) * newWordlen);
 		if (reallocWords == NULL)
 			return FAIL_OUT_OF_MEMORY;
 		else
@@ -334,7 +334,7 @@ static ErrorMessage big_refine(bigint* x) {
 }
 /**
  * assign a bigint to another bigint.
- * 
+ *
  * \param dst : address of bigint to be assigned (can be NULL)
  * \param src : bigint to assign (can't be NULL)
  * \return : ErrorMessage
@@ -349,7 +349,7 @@ ErrorMessage big_assign(bigint** dst, bigint* src) {
 }
 /**
  * generate a random bigint.
- * 
+ *
  * \param x : address of bigint (can be NULL)
  * \param sign : sign of bigint (NON_NEGATIVE = 0, NEGATIVE = 1)
  * \param wordlen : word length of bigint (int type)
@@ -364,7 +364,7 @@ ErrorMessage big_gen_rand(bigint** x, int sign, int wordlen)
 }
 /**
  * return word length of bigint.
- * 
+ *
  * \param x : bigint (can't be NULL)
  * \return : word length of bigint
  */
@@ -375,7 +375,7 @@ int big_get_wordlen(bigint* x) {
 }
 /**
  * return bit length of bigint.
- * 
+ *
  * \param x : bigint (can't be NULL)
  * \return : big length of bigint
  */
@@ -398,7 +398,7 @@ int big_get_bitlen(bigint* x) {
 }
 /**
  * return a certain bit of bigint.
- * 
+ *
  * \param x : bigint (can't be NULL)
  * \param bitindex : position of certain bit (int type)
  * \return : certain bit of bigint
@@ -422,7 +422,7 @@ int big_get_bit(bigint* x, int bitindex) {
 }
 /**
  * return sign of bigint.
- * 
+ *
  * \param x : bigint (can't be NULL)
  * \return : sign of bigint (NON_NEGATIVE = 0, NEGATIVE = 1)
  */
@@ -433,9 +433,9 @@ int big_get_sign(bigint* x) {
 }
 /**
  * filp sign of bigint.
- * 
+ *
  * \param x : bigint (can't be NULL)
- * \return : ErrorMessage 
+ * \return : ErrorMessage
  */
 ErrorMessage big_flip_sign(bigint** x) {
 	if (x == NULL)
@@ -447,7 +447,7 @@ ErrorMessage big_flip_sign(bigint** x) {
 }
 /**
  * set the bigint to 0.
- * 
+ *
  * \param x : address of bigint (can be NULL)
  * \return : ErrorMessage
  */
@@ -458,7 +458,7 @@ ErrorMessage big_set_zero(bigint** x) {
 }
 /**
  * set the bigint to 1.
- * 
+ *
  * \param x : address of bigint (can be NULL)
  * \return : ErrorMessage
  */
@@ -469,7 +469,7 @@ ErrorMessage big_set_one(bigint** x) {
 }
 /**
  * return if the bigint is 0 or not.
- * 
+ *
  * \param x : bigint (can't be NULL)
  * \return : if the bigint is 0 or not
  */
@@ -503,7 +503,7 @@ bool big_is_minus_one(bigint* x)
 		return FAIL_NULL;
 	big_refine(x);
 	return (x->sign == NEGATIVE) && (x->wordlen == 1) && (x->a[0] == 0x1);
-	
+
 }
 /**
  * return if the bigint is odd or not.
@@ -533,7 +533,7 @@ bool big_is_even(bigint* x)
 }
 /**
  * return the comparison between two bigints.
- * 
+ *
  * \param x : one bigint (can't be NULL)
  * \param y : the other bigint (can't be NULL)
  * \return : comparison of two bigints (1 = x is bigger, 0 = two numbers are equal, -1 = y is bigger)
@@ -636,7 +636,7 @@ ErrorMessage big_bit_left_shift(bigint** dst, bigint* src, int count) {
 #elif WORD_UNIT==64
 	quotient >>= 6;
 #endif
-	
+
 	int newWordlen = src->wordlen + quotient;
 	// if count = quotient * WORD_UNIT -> big_word_shift(quotient)
 	if (remainder == 0)
@@ -699,7 +699,7 @@ ErrorMessage big_bit_right_shift(bigint** dst, bigint* src, int count) {
 #elif WORD_UNIT==64
 	quotient >>= 6;
 #endif
-	
+
 	int newWordlen = src->wordlen - quotient;
 	// if count = quotient * WORD_UNIT -> big_word_shift(quotient)
 	if (remainder == 0)
@@ -717,7 +717,7 @@ ErrorMessage big_bit_right_shift(bigint** dst, bigint* src, int count) {
 		else
 			tmp->a[i] = ((src->a[i + quotient + 1]) << (WORD_UNIT - remainder) | ((src->a[i + quotient]) >> remainder));
 	}
-	
+
 	big_refine(tmp);
 	big_assign(dst, tmp);
 	big_delete(&tmp);
@@ -777,7 +777,7 @@ ErrorMessage big_bit_reduction(bigint** dst, bigint* src, int count)
 		else
 			tmp->a[i] = src->a[i];
 	}
-	
+
 	big_refine(tmp);
 	big_assign(dst, tmp);
 	big_delete(&tmp);
@@ -897,7 +897,7 @@ ErrorMessage big_word_reduction(bigint** dst, bigint* src, int count)
 }
 /**
  * addition x + y = z.
- * 
+ *
  * \param z : address of bigint z (can be NULL)
  * \param x : one bigint (can't be NULL)
  * \param y : another bigint (can't be NULL)
@@ -974,8 +974,8 @@ static ErrorMessage big_additionABS(bigint** z, bigint* x, bigint* y)
 	for (int i = 0; i < newWordlen; i++)
 	{
 		// A , B
-		word xWord = 0; 
-		word yWord = 0; 
+		word xWord = 0;
+		word yWord = 0;
 		//if A or B do not have value -> A = 0, B = 0
 		if (i < xWordlen)
 			xWord = xWords[i];
@@ -1004,7 +1004,7 @@ static ErrorMessage big_additionABS(bigint** z, bigint* x, bigint* y)
 }
 /**
  * substraction x - y = z.
- * 
+ *
  * \param z : address of bigint z (can be NULL)
  * \param x : one bigint (can't be NULL)
  * \param y : another bigint (can't be NULL)
@@ -1020,7 +1020,7 @@ ErrorMessage big_substraction(bigint** z, bigint* x, bigint* y)
 	big_refine(x);
 	big_refine(y);
 
-	int comp = big_compare(x, y); 
+	int comp = big_compare(x, y);
 	// x = 0 -> x - y = -y
 	if (big_is_zero(x))
 	{
@@ -1041,7 +1041,7 @@ ErrorMessage big_substraction(bigint** z, bigint* x, bigint* y)
 	{
 		int xSign = x->sign;
 		int ySign = y->sign;
-		
+
 		// x < 0 && y > 0 -> x - y = - (absx + y)
 		if ((xSign == NEGATIVE) && (ySign == NON_NEGATIVE))
 		{
@@ -1125,19 +1125,19 @@ static ErrorMessage big_substractionABS(bigint** z, bigint* x, bigint* y)
 }
 /**
  * multiplication x * y = z.
- * 
+ *
  * \param z : address of bigint z (can be NULL)
  * \param x : one bigint (can't be NULL)
  * \param y : another bigint (can't be NULL)
  * \return : ErrorMessage
  */
-ErrorMessage big_multiplication(bigint** z, bigint* x, bigint* y) 
+ErrorMessage big_multiplication(bigint** z, bigint* x, bigint* y)
 {
 	if (x == NULL || y == NULL)
 		return FAIL_NULL;
 	// alloc
 	bigint* tmp = NULL;
-	
+
 	big_refine(x);
 	big_refine(y);
 	// x = 0 or y = 0  -> x * y = 0
@@ -1166,7 +1166,7 @@ ErrorMessage big_multiplication(bigint** z, bigint* x, bigint* y)
 		big_squaring(&tmp, x);
 	}
 	else
-	{	
+	{
 		// tmp = |x| * |y|
 		if (x->sign == NON_NEGATIVE)
 		{
@@ -1262,7 +1262,7 @@ static ErrorMessage big_multiplicationSchoolBook(bigint** z, bigint* x, bigint* 
 
 	big_delete(&T0);
 	big_delete(&T1);
-	
+
 	return SUCCESS;
 }
 // static function
@@ -1309,7 +1309,7 @@ static ErrorMessage big_multiplicationKaratsuba(bigint** z, bigint* x, bigint* y
 		big_new(&R, NON_NEGATIVE, rWordlen);
 		for (int i = 0; i < rWordlen; i++)
 		{
-			if (i < 2 * l) 
+			if (i < 2 * l)
 			{
 				if (T0->wordlen > i)
 					R->a[i] = T0->a[i];
@@ -1319,9 +1319,8 @@ static ErrorMessage big_multiplicationKaratsuba(bigint** z, bigint* x, bigint* y
 				R->a[i] = T1->a[i - 2 * l];
 			}
 		}
-
 		big_refine(R);
-	
+
 		// S1 = A0 - A1, S0 = B1 - B0
 		big_substraction(&S1, A0, A1);
 		big_substraction(&S0, B1, B0);
@@ -1355,7 +1354,7 @@ static ErrorMessage big_multiplicationKaratsuba(bigint** z, bigint* x, bigint* y
 }
 /**
  * multiplication with constant x * y = z.
- * 
+ *
  * \param z : address of bigint z (can be NULL)
  * \param x : bigint (can't be NULL)
  * \param y : word
@@ -1373,7 +1372,7 @@ ErrorMessage big_multiplicationConst(bigint** z, bigint* x, word y)
 	{
 		big_set_zero(&tmp);
 	}
-	else 
+	else
 	{
 		bigint* tmp2 = NULL;
 		big_set_zero(&tmp2);
@@ -1405,7 +1404,7 @@ ErrorMessage big_multiplicationConst(bigint** z, bigint* x, word y)
 
 /**
  * squaring z = x * x.
- * 
+ *
  * \param z : address of bigint z (can be NULL)
  * \param x : bigint (can't be NULL)
  * \return : ErrorMessage
@@ -1470,7 +1469,7 @@ static ErrorMessage big_squaringSchoolBook(bigint** z, bigint* x)
 		// C1 = A^2 || A^2 || A^2 || A^2 || A^2 ...
 		word A0 = 0, A1 = 0;
 		wordSquaring(&A1, &A0, xWords[i]);
-		
+
 		C1->a[i * 2] = A0;
 		C1->a[i * 2 + 1] = A1;
 
@@ -1485,7 +1484,7 @@ static ErrorMessage big_squaringSchoolBook(bigint** z, bigint* x)
 			word A = 0, B = 0;
 			wordMultiplication(&A, &B, xWords[i], xWords[j]);
 			T1->a[i + j + 1] = A;
-			T0->a[i + j] = B;			
+			T0->a[i + j] = B;
 		}
 		// tmp = tmp + T
 		big_addition(&C2, C2, T1);
@@ -1517,7 +1516,7 @@ static ErrorMessage big_squaringKaratsuba(bigint** z, bigint* x)
 	{
 		// calculate shift bit
 		int l = (xWordlen + 1) >> 1;
-		
+
 		//alloc
 		bigint* A1 = NULL;
 		bigint* A0 = NULL;
@@ -1572,7 +1571,7 @@ static ErrorMessage big_squaringKaratsuba(bigint** z, bigint* x)
 
 /**
  * division x = y * q + r (0 <= r < y).
- * 
+ *
  * \param q : address of bigint q (can be NULL)
  * \param r : address of bigint r (can be NULL)
  * \param x : bigint x (can't be NULL)
@@ -1646,9 +1645,9 @@ static ErrorMessage big_divisionABS(bigint** q, bigint** r, bigint* x, bigint* y
 		word Ai[1] = { x->a[i] };
 		// R = RW + Ai
 		big_set_by_array(&A, NON_NEGATIVE, Ai, 1);
-		big_word_left_shift(r, *r, 1);		
+		big_word_left_shift(r, *r, 1);
 		big_addition(r, *r, A);
-		
+
 		// (Qi, R) <- DIVC(R, B)
 		word Qi = 0;
 		big_divisionCore(&Qi, r, *r, y);
@@ -1722,7 +1721,7 @@ static ErrorMessage big_divisionCoreCore(word* q, bigint** r, bigint* x, bigint*
 	big_multiplicationConst(&BQ, y, *q);
 	big_substraction(r, x, BQ);
 
- 	// while R < 0 
+	// while R < 0 
 	while ((*r)->sign == NEGATIVE)
 	{
 		(*q) -= 1;
@@ -1734,7 +1733,7 @@ static ErrorMessage big_divisionCoreCore(word* q, bigint** r, bigint* x, bigint*
 
 /**
  * modular x mod y = z.
- * 
+ *
  * \param z : address of bigint z (can be NULL)
  * \param x : bigint x (can't be NULL)
  * \param y : bigint y (can't be NULL) (y > 0)
@@ -1786,7 +1785,7 @@ ErrorMessage big_mod(bigint** z, bigint* x, bigint* y)
 
 /**
  * modular inverse x * z = 1 (mod y).
- * 
+ *
  * \param z : address of bigint z (can be NULL)
  * \param x : bigint x (can't be NULL)
  * \param y : bigint y (can't be NULL) (y > 0) (y is odd prime)
@@ -1810,7 +1809,7 @@ ErrorMessage big_mod_inverse(bigint** z, bigint* x, bigint* y)
 
 	if (u->sign == NEGATIVE)
 		big_addition(&u, u, y);
-	
+
 	big_mod(z, u, y);
 
 	big_delete(&d);
@@ -1821,7 +1820,7 @@ ErrorMessage big_mod_inverse(bigint** z, bigint* x, bigint* y)
 
 /**
  * modular exponentiation x ^ n mod y = z.
- * 
+ *
  * \param z : address of bigint z (can be NULL)
  * \param x : bigint x (can't be NULL)
  * \param n : bigint n (can't be NULL) (n >= 0)
@@ -1839,7 +1838,7 @@ ErrorMessage big_mod_exp(bigint** z, bigint* x, bigint* n, bigint* y)
 		return FAIL_INVALID_EXPONENT;
 	// alloc
 	bigint* tmp = NULL;
-	
+
 	if (big_is_zero(x))
 	{
 		big_set_zero(&tmp);
@@ -1983,7 +1982,7 @@ static ErrorMessage big_mod_expMS(bigint** z, bigint* x, bigint* n, bigint* y)
 
 /**
  * greatest common divisor : gcd(x, y) = z.
- * 
+ *
  * \param z : address of bigint z (can be NULL)
  * \param x : bigint x (can't be NULL) (x >= 0)
  * \param y : bigint y (can't be NULL) (y >= 0)
@@ -2018,7 +2017,7 @@ static ErrorMessage big_gcdRecursive(bigint** z, bigint* x, bigint* y)
 		big_mod(&tmp, x, y);
 		// gcd(x, y) =  gcd(y, x % y)
 		big_gcdRecursive(z, y, tmp);
-		
+
 		big_delete(&tmp);
 	}
 
@@ -2027,7 +2026,7 @@ static ErrorMessage big_gcdRecursive(bigint** z, bigint* x, bigint* y)
 
 /**
  * extended euclidean algorhitm : compute a integeral solution(x,y) of ax + by = gcd(a,b) and gcd(a,b).
- * 
+ *
  * \param d : address of bigint gcd(a, b) (can be NULL)
  * \param x : address of bigint x (can be NULL)
  * \param y : address of bigint y (can be NULL)
@@ -2079,7 +2078,7 @@ static ErrorMessage big_xgcdRecursive(bigint** d, bigint** x, bigint** y, bigint
 		bigint* tmpR = NULL;
 		bigint* tmpQ = NULL;
 
-		big_division(&tmpQ,&tmpR, a, b);
+		big_division(&tmpQ, &tmpR, a, b);
 
 		// xgcd(d, u, v, a, b) = xgcd(d, u0, v0, b, a%b)
 		big_xgcdRecursive(d, &x0, &y0, b, tmpR);
