@@ -1243,24 +1243,17 @@ static ErrorMessage big_multiplicationSchoolBook(bigint** z, bigint* x, bigint* 
 	for (int i = 0; i < xWordlen; i++)
 	{
 		word currentWord = x->a[i];
-		// T0 = Ai * B0 || Ai * B2 || Ai * B4 || ...
-		// T1 = Ai * B1 || Ai * B3 || Ai * B5 || ...
+		// T0 = (Ai * Bj) 's lower word
+		// T1 = (Ai * B1) 's upper word
 		big_new(&T0, NON_NEGATIVE, yWordlen + i + 2);
 		big_new(&T1, NON_NEGATIVE, yWordlen + i + 2);
 		for (int j = 0; j < yWordlen; j++)
 		{
 			word A = 0, B = 0;
 			wordMultiplication(&A, &B, currentWord, yWords[j]);
-			if (j % 2 == 0)
-			{
-				T0->a[i + j + 1] = A;
-				T0->a[i + j] = B;
-			}
-			else
-			{
-				T1->a[i + j + 1] = A;
-				T1->a[i + j] = B;
-			}
+
+			T1->a[i + j + 1] = A;
+			T0->a[i + j] = B;
 		}
 		big_addition(z, *z, T0);
 		big_addition(z, *z, T1);
@@ -1326,6 +1319,7 @@ static ErrorMessage big_multiplicationKaratsuba(bigint** z, bigint* x, bigint* y
 				R->a[i] = T1->a[i - 2 * l];
 			}
 		}
+
 		big_refine(R);
 	
 		// S1 = A0 - A1, S0 = B1 - B0
@@ -1465,7 +1459,8 @@ static ErrorMessage big_squaringSchoolBook(bigint** z, bigint* x)
 	// alloc
 	bigint* C1 = NULL;
 	bigint* C2 = NULL;
-	bigint* T = NULL;
+	bigint* T0 = NULL;
+	bigint* T1 = NULL;
 
 	big_new(&C1, NON_NEGATIVE, 2 * xWordlen);
 	big_set_zero(&C2);
@@ -1478,27 +1473,34 @@ static ErrorMessage big_squaringSchoolBook(bigint** z, bigint* x)
 		
 		C1->a[i * 2] = A0;
 		C1->a[i * 2 + 1] = A1;
+
+		// T0 = (Ai * Ai) 's lower word
+		// T1 = (Ai * Ai) 's upper word
+		big_new(&T0, NON_NEGATIVE, i + xWordlen + 2);
+		big_new(&T1, NON_NEGATIVE, i + xWordlen + 2);
+
 		for (int j = i + 1; j < xWordlen; j++)
 		{
-			// C2 = (AiAj) << w(i+j)
-			big_new(&T, NON_NEGATIVE, i + j + 2);
+			// C2 = (AiAj) << w (i + j)
 			word A = 0, B = 0;
 			wordMultiplication(&A, &B, xWords[i], xWords[j]);
-			T->a[i + j + 1] = A;
-			T->a[i + j] = B;
-			// tmp = tmp + T
-			big_addition(&C2, C2, T);
-
+			T1->a[i + j + 1] = A;
+			T0->a[i + j] = B;			
 		}
+		// tmp = tmp + T
+		big_addition(&C2, C2, T1);
+		big_addition(&C2, C2, T0);
 	}
 
+	// C2 = C2 << 1
 	big_bit_left_shift(&C2, C2, 1);
 
 	big_addition(z, C1, C2);
 
 	big_delete(&C1);
 	big_delete(&C2);
-	big_delete(&T);
+	big_delete(&T0);
+	big_delete(&T1);
 	return SUCCESS;
 }
 // static function
