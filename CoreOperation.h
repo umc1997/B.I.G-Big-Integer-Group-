@@ -33,6 +33,7 @@ bool big_is_one(bigint* x);
 bool big_is_minus_one(bigint* x);
 bool big_is_odd(bigint* x);
 bool big_is_even(bigint* x);
+bool big_is_relatively_prime(bigint* x, bigint* y);
 
 // shower
 ErrorMessage big_show_hex(bigint* x);
