@@ -1228,9 +1228,6 @@ static ErrorMessage big_multiplicationSchoolBook(bigint** z, bigint* x, bigint* 
 {
 	if (x == NULL || y == NULL)
 		return FAIL_NULL;
-
-	word* xWords = x->a;
-	word* yWords = y->a;
 	int xWordlen = x->wordlen;
 	int yWordlen = y->wordlen;
 
@@ -1249,9 +1246,38 @@ static ErrorMessage big_multiplicationSchoolBook(bigint** z, bigint* x, bigint* 
 		big_new(&T1, NON_NEGATIVE, yWordlen + i + 2);
 		for (int j = 0; j < yWordlen; j++)
 		{
-			word A = 0, B = 0;
-			wordMultiplication(&A, &B, currentWord, yWords[j]);
+			word A = 0;
+			word B = 0;
+			
+#if 1
+			wordMultiplication(&A, &B, currentWord, y->a[j]);
+#else 
+			// A = A0 + A1 * W^(1/2), B = B0 + B1 * W^(1/2)
+			word A1, A0, B1, B0, t1, t0, t;
+			unsigned int shiftUnit = WORD_UNIT >> 1;
+			A1 = currentWord >> shiftUnit;
+			A0 = currentWord - (A1 << shiftUnit);
+			B1 = (y->a[j]) >> shiftUnit;
+			B0 = (y->a[j]) - (B1 << shiftUnit);
 
+			// A * B = A1B1 * W + (A0B1 + A1B0) * W^(1/2) + A0B0
+			// W^(1/2) part : A0B1 + A1B0
+			t1 = A1 * B0;
+			t0 = A0 * B1;
+
+			t0 += t1;
+			t1 = (t0 < t1); // carry
+
+			// W and 1 part : A1B1 and A0B0 
+			A = A1 * B1;
+			B = A0 * B0;
+
+			// final
+			t = B;
+			B += (t0 << shiftUnit);
+			A += (t1 << shiftUnit) + (t0 >> shiftUnit) + (B < t);
+
+#endif
 			T1->a[i + j + 1] = A;
 			T0->a[i + j] = B;
 		}

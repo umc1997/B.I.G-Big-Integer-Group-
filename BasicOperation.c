@@ -110,7 +110,7 @@ bool isValidChar(char c, int base)
 ErrorMessage wordMultiplication(word* C1, word* C0, word A, word B)
 {
 	// A = A0 + A1 * W^(1/2), B = B0 + B1 * W^(1/2)
-	word A1, A0, B1, B0, T1, T0, T;
+	word A1 = 0, A0 = 0, B1 = 0, B0 = 0, T1 = 0, T0 = 0, T = 0;
 	unsigned int shiftUnit = WORD_UNIT >> 1;
 	A1 = A >> shiftUnit;
 	A0 = A - (A1 << shiftUnit);
