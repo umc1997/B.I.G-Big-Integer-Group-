@@ -532,6 +532,24 @@ bool big_is_even(bigint* x)
 	return !((x->a[0]) & 0x1);
 }
 /**
+ * return if gcd(x, y) = 1.
+ * 
+ * \param x : bigint (can't be NULL) (x > 1)
+ * \param y : bigint (can't be NULL) (x > 1)
+ * \return : if gcd(x, y) = 1
+ */
+bool big_is_relatively_prime(bigint* x, bigint* y)
+{
+	if (x == NULL || y == NULL)return FAIL_NULL;
+	if (x->sign == NEGATIVE || y->sign == NEGATIVE) return FAIL_INVALID_INPUT;
+	if (big_is_zero(x) || big_is_one(x) || big_is_zero(y) || big_is_one(y)) return FAIL_INVALID_INPUT;
+	bigint* d = NULL;
+	big_gcd(&d, x, y);
+	bool ret = big_is_one(d);
+	big_delete(&d);
+	return ret;
+}
+/**
  * return the comparison between two bigints.
  *
  * \param x : one bigint (can't be NULL)
@@ -1831,7 +1849,7 @@ ErrorMessage big_mod_inverse(bigint** z, bigint* x, bigint* y)
 	bigint* v = NULL;
 	big_xgcd(&d, &u, &v, x, y);
 	if (!big_is_one(d))
-		return FAIL_INVALID_DIVISOR;
+		return FAIL_INVALID_INPUT;
 
 	if (u->sign == NEGATIVE)
 		big_addition(&u, u, y);
@@ -2021,7 +2039,7 @@ ErrorMessage big_gcd(bigint** z, bigint* x, bigint* y)
 	big_refine(x);
 	big_refine(y);
 	if (x->sign == NEGATIVE || y->sign == NEGATIVE)
-		return FAIL_INVALID_DIVISOR;
+		return FAIL_INVALID_INPUT;
 	bigint* tmp = NULL;
 
 	big_gcdRecursive(&tmp, x, y);
@@ -2067,7 +2085,7 @@ ErrorMessage big_xgcd(bigint** d, bigint** x, bigint** y, bigint* a, bigint* b)
 	big_refine(a);
 	big_refine(b);
 	if (a->sign == NEGATIVE || b->sign == NEGATIVE)
-		return FAIL_INVALID_DIVISOR;
+		return FAIL_INVALID_INPUT;
 
 	bigint* tmpD = NULL;
 	bigint* tmpX = NULL;
