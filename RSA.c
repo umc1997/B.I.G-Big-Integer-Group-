@@ -3,10 +3,12 @@
 #define ENCRYPTION_KEY "10001"
 #define PRIME_LIST_NUM 53
 
+/* prototype */
 static ErrorMessage big_gen_secure_prime(bigint** p);
 static bool big_isPrime(bigint* p);
 static bool big_isSecurePrime(bigint* p);
 static ErrorMessage big_gen_nbit_prime(bigint** p);
+/* prototype */
 
 /**
  * Generate public key and private key for RSA.

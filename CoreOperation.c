@@ -257,32 +257,6 @@ ErrorMessage big_show_dec(bigint* x)
 	return SUCCESS;
 }
 /**
- * show bigint by decimal for each word.
- *
- * \param x : bigint (can't be NULL)
- * \return : ErrorMessage
- */
-ErrorMessage big_show_dec_for_each_word(bigint* x) {
-	if (x == NULL)
-		return FAIL_NULL;
-	big_refine(x);
-	int wordlen = x->wordlen;
-	if (x->sign == NEGATIVE)
-		printf("-");
-	for (int i = wordlen - 1; i >= 0; i--)
-	{
-#if WORD_UNIT==8
-		printf("%03d:", x->a[i]);
-#elif WORD_UNIT==32
-		printf("%010u:", x->a[i]);
-#elif WORD_UNIT==64
-		printf("%020llu:", x->a[i]);
-#endif
-	}
-	printf("\n");
-	return SUCCESS;
-}
-/**
  * show bigint by binary.
  *
  * \param x : bigint (can't be NULL)
@@ -563,6 +537,8 @@ int big_compare(bigint* x, bigint* y) {
 	big_refine(y);
 	int xSign = x->sign;
 	int ySign = y->sign;
+	// 1. if both signs are same -> compareABS
+	// 2. if both signs are different -> NON_NEGATIVE is bigger
 	if (xSign == ySign)
 	{
 		//both are non-negative
@@ -607,16 +583,17 @@ static int big_compareABS(bigint* x, bigint* y)
 {
 	int xWordlen = x->wordlen;
 	int yWordlen = y->wordlen;
+	// 1. if both word lengths are same -> compare each word 
+	// 1. if both word lengths are different -> the longer integer is bigger
 	if (xWordlen < yWordlen)
 		return SMALLER;
 	else if (xWordlen > yWordlen)
 		return BIGGER;
 	else
 	{
-		int i;
 		word* xWords = x->a;
 		word* yWords = y->a;
-		for (i = xWordlen - 1; i >= 0; i--)
+		for (int i = xWordlen - 1; i >= 0; i--)
 		{
 			if (xWords[i] > yWords[i])
 				return BIGGER;
@@ -1267,35 +1244,8 @@ static ErrorMessage big_multiplicationSchoolBook(bigint** z, bigint* x, bigint* 
 			word A = 0;
 			word B = 0;
 			
-#if 1
 			wordMultiplication(&A, &B, currentWord, y->a[j]);
-#else 
-			// A = A0 + A1 * W^(1/2), B = B0 + B1 * W^(1/2)
-			word A1, A0, B1, B0, t1, t0, t;
-			unsigned int shiftUnit = WORD_UNIT >> 1;
-			A1 = currentWord >> shiftUnit;
-			A0 = currentWord - (A1 << shiftUnit);
-			B1 = (y->a[j]) >> shiftUnit;
-			B0 = (y->a[j]) - (B1 << shiftUnit);
 
-			// A * B = A1B1 * W + (A0B1 + A1B0) * W^(1/2) + A0B0
-			// W^(1/2) part : A0B1 + A1B0
-			t1 = A1 * B0;
-			t0 = A0 * B1;
-
-			t0 += t1;
-			t1 = (t0 < t1); // carry
-
-			// W and 1 part : A1B1 and A0B0 
-			A = A1 * B1;
-			B = A0 * B0;
-
-			// final
-			t = B;
-			B += (t0 << shiftUnit);
-			A += (t1 << shiftUnit) + (t0 >> shiftUnit) + (B < t);
-
-#endif
 			T1->a[i + j + 1] = A;
 			T0->a[i + j] = B;
 		}
@@ -1636,20 +1586,24 @@ ErrorMessage big_division(bigint** q, bigint** r, bigint* x, bigint* y)
 	big_refine(x);
 	big_refine(y);
 
+	// if x < y -> x / y = 0 ... x
 	if (big_compare(x, y) == SMALLER)
 	{
 		big_set_zero(&tmpQ);
 		big_assign(&tmpR, x);
 	}
+	// if x == y -> x / y = 1 ... 0
 	else if (big_compare(x, y) == EQUAL)
 	{
 		big_set_one(&tmpQ);
 		big_set_zero(&tmpR);
 	}
+	// if x >= 0 -> divisionABS(x, y)
 	else if (x->sign == NON_NEGATIVE)
 	{
 		big_divisionABS(&tmpQ, &tmpR, x, y);
 	}
+	// if x < 0 -> divisionABS(-x, y) -> r = b - r', q = -q' - 1
 	else
 	{
 		bigint* absX = NULL;
@@ -1682,7 +1636,7 @@ static ErrorMessage big_divisionABS(bigint** q, bigint** r, bigint* x, bigint* y
 	big_new(q, NON_NEGATIVE, qWordlen);
 	big_set_zero(r);
 
-	// main logic
+	// main logic : multi-precision long division
 	for (int i = x->wordlen - 1; i > -1; i--)
 	{
 		// R = RW + Ai
@@ -1721,11 +1675,14 @@ static ErrorMessage big_divisionCore(word* q, bigint** r, bigint* x, bigint* y)
 		bigint* shiftedA = NULL;
 		bigint* shiftedB = NULL;
 
+		// shift A and B
 		big_bit_left_shift(&shiftedA, x, k);
 		big_bit_left_shift(&shiftedB, y, k);
-
+		
+		// compute q' and r'
 		big_divisionCoreCore(q, r, shiftedA, shiftedB);
 
+		// q = q', r = r' >> k
 		big_bit_right_shift(r, *r, k);
 
 		big_delete(&shiftedA);

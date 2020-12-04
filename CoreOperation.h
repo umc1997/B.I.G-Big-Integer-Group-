@@ -38,7 +38,6 @@ bool big_is_relatively_prime(bigint* x, bigint* y);
 // shower
 ErrorMessage big_show_hex(bigint* x);
 ErrorMessage big_show_dec(bigint* x);
-ErrorMessage big_show_dec_for_each_word(bigint* x);
 ErrorMessage big_show_bin(bigint* x);
 
 // assign src bigint to dst bigint
