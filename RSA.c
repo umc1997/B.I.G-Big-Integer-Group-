@@ -1,10 +1,20 @@
 #include "RSA.h"
 
+#define ENCRYPTION_KEY "10001"
+#define PRIME_LIST_NUM 53
+
 static ErrorMessage big_gen_secure_prime(bigint** p);
 static bool big_isPrime(bigint* p);
 static bool big_isSecurePrime(bigint* p);
 static ErrorMessage big_gen_nbit_prime(bigint** p);
 
+/**
+ * Generate public key and private key for RSA.
+ * 
+ * \param publicKey : address of public key for encipher and decipher
+ * \param privateKey : addres of private key for decipher
+ * \return : ErrorMessage
+ */
 ErrorMessage big_RSA_key_gen(bigint** publicKey, bigint** privateKey)
 {
 	bigint* p = NULL;
@@ -58,10 +68,18 @@ ErrorMessage big_RSA_key_gen(bigint** publicKey, bigint** privateKey)
 	return SUCCESS;
 }
 
-ErrorMessage big_RSA_encryption(bigint** cipherText, bigint* plainText, bigint* publicKey)
+/**
+ * Encipher a plain text to cipher text using public key.
+ * 
+ * \param cipherText : address of cipher text
+ * \param plainText : plain text to encipher
+ * \param publicKey : public key
+ * \return : ErrorMessage
+ */
+ErrorMessage big_RSA_encipher(bigint** cipherText, bigint* plainText, bigint* publicKey)
 {
 	if (plainText == NULL || publicKey == NULL) return FAIL_NULL;
-	if (big_compare(plainText, publicKey) == BIGGER) return FAIL_INVALID_INPUT;
+	if (big_compare(publicKey, plainText) == SMALLER) return FAIL_INVALID_INPUT; // plain text must be smaller than public key
 	bigint* e = NULL;
 	bigint* tmp = NULL;
 
@@ -74,7 +92,16 @@ ErrorMessage big_RSA_encryption(bigint** cipherText, bigint* plainText, bigint* 
 	return SUCCESS;
 }
 
-ErrorMessage big_RSA_decryption(bigint** plainText, bigint* cipherText, bigint* publicKey, bigint* privateKey)
+/**
+ * Decipher a cipher tect to plain text using public key and private key.
+ * 
+ * \param plainText : address of plain text
+ * \param cipherText : cipher text to decipher
+ * \param publicKey : public key
+ * \param privateKey : private key
+ * \return :ErrorMessage
+ */
+ErrorMessage big_RSA_decipher(bigint** plainText, bigint* cipherText, bigint* publicKey, bigint* privateKey)
 {
 	if (cipherText == NULL || privateKey == NULL)
 		return FAIL_NULL;
@@ -88,6 +115,7 @@ ErrorMessage big_RSA_decryption(bigint** plainText, bigint* cipherText, bigint* 
 	return SUCCESS;
 }
 
+//static function
 static ErrorMessage big_gen_secure_prime(bigint** p)
 {
 	bigint* tmp = NULL;
@@ -101,6 +129,7 @@ static ErrorMessage big_gen_secure_prime(bigint** p)
 	big_delete(&tmp);
 	return SUCCESS;
 }
+//static function
 static ErrorMessage big_gen_nbit_prime(bigint** p)
 {
 	bigint* tmp = NULL;
@@ -142,6 +171,7 @@ static ErrorMessage big_gen_nbit_prime(bigint** p)
 	big_delete(&two);
 	return SUCCESS;
 }
+//static function
 static bool big_isPrime(bigint* p)
 {
 	int PRIME_LIST[PRIME_LIST_NUM] = {
@@ -244,6 +274,7 @@ static bool big_isPrime(bigint* p)
 
 	return isPrime;
 }
+//static function
 static bool big_isSecurePrime(bigint* p)
 {
 	bigint* tmp = NULL;
