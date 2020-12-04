@@ -1236,7 +1236,8 @@ static ErrorMessage big_multiplicationABS(bigint** z, bigint* x, bigint* y)
 	int newWordlen = x->wordlen + y->wordlen;
 	big_new(z, NON_NEGATIVE, newWordlen);
 
-	big_multiplicationKaratsuba(z, x, y);
+	//big_multiplicationKaratsuba(z, x, y);
+	big_multiplicationSchoolBook(z, x, y);
 
 	big_refine(*z);
 	return SUCCESS;
