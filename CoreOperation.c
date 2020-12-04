@@ -1236,7 +1236,8 @@ static ErrorMessage big_multiplicationABS(bigint** z, bigint* x, bigint* y)
 	int newWordlen = x->wordlen + y->wordlen;
 	big_new(z, NON_NEGATIVE, newWordlen);
 
-	big_multiplicationKaratsuba(z, x, y);
+	//big_multiplicationKaratsuba(z, x, y);
+	big_multiplicationSchoolBook(z, x, y);
 
 	big_refine(*z);
 	return SUCCESS;
@@ -1685,18 +1686,14 @@ static ErrorMessage big_divisionABS(bigint** q, bigint** r, bigint* x, bigint* y
 	// main logic
 	for (int i = x->wordlen - 1; i > -1; i--)
 	{
-		bigint* A = NULL;
-		word Ai[1] = { x->a[i] };
 		// R = RW + Ai
-		big_set_by_array(&A, NON_NEGATIVE, Ai, 1);
 		big_word_left_shift(r, *r, 1);
-		big_addition(r, *r, A);
+		(*r)->a[0] = x->a[i];
 
 		// (Qi, R) <- DIVC(R, B)
 		word Qi = 0;
 		big_divisionCore(&Qi, r, *r, y);
 		(*q)->a[i] = Qi;
-		big_delete(&A);
 	}
 
 	big_refine(*q);

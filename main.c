@@ -14,7 +14,6 @@ int main()
 	bigint* c = NULL;
 	bigint* n = NULL;
 
-
 	int testCase = 1000;
 	int bit = 2048;
 	int aWordlen = bit / WORD_UNIT; // 1024 - bit
@@ -48,6 +47,7 @@ int main()
 			/* operation */
 			//big_mod_exp(&c, a, n, b);
 			big_multiplication(&c, a, b);
+			//big_division(&n, &c, a, b);
 			//big_squaring(&c, a);
 			big_mod(&c, c, n);
 
