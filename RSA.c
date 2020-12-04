@@ -3,7 +3,7 @@
 static ErrorMessage big_gen_secure_prime(bigint** p);
 static bool big_isPrime(bigint* p);
 static bool big_isSecurePrime(bigint* p);
-static ErrorMessage big_gen_Nbit_prime(bigint** p);
+static ErrorMessage big_gen_nbit_prime(bigint** p);
 
 ErrorMessage big_RSA_key_gen(bigint** publicKey, bigint** privateKey)
 {
@@ -16,6 +16,7 @@ ErrorMessage big_RSA_key_gen(bigint** publicKey, bigint** privateKey)
 	bigint* minusOne = NULL;
 	bigint* check = NULL;
 
+	big_set_zero(&check);
 	do {
 		// 1. generate two n/2-bit prime p,q
 		big_gen_secure_prime(&p);
@@ -23,12 +24,6 @@ ErrorMessage big_RSA_key_gen(bigint** publicKey, bigint** privateKey)
 		// p != q
 		if (big_compare(p, q) == EQUAL)
 			continue;
-		printf("p = ");
-		big_show_hex(p);
-		printf("\n");
-		printf("q = ");
-		big_show_hex(q);
-		printf("\n");
 
 		// 2. calculate N = p * q and phi = (p - 1) * (q - 1)
 		big_multiplication(&N, p, q);
@@ -98,7 +93,7 @@ static ErrorMessage big_gen_secure_prime(bigint** p)
 	bigint* tmp = NULL;
 	do
 	{
-		big_gen_Nbit_prime(&tmp);
+		big_gen_nbit_prime(&tmp);
 	} while (big_isSecurePrime(tmp));
 	//check (p-1)/2 is prime?
 
@@ -106,7 +101,7 @@ static ErrorMessage big_gen_secure_prime(bigint** p)
 	big_delete(&tmp);
 	return SUCCESS;
 }
-static ErrorMessage big_gen_Nbit_prime(bigint** p)
+static ErrorMessage big_gen_nbit_prime(bigint** p)
 {
 	bigint* tmp = NULL;
 	bigint* two = NULL;
@@ -197,12 +192,12 @@ static bool big_isPrime(bigint* p)
 	}
 	// gen a such that 2 < a < p
 	bigint* a = NULL;
-	bool flag = false;
+	bool probablyPrime = false;
 	for (int i = 0; i < MR_TEST_ROUND; i++)
 	{
 		do
 		{
-			big_gen_rand(&a, NON_NEGATIVE, 4);
+			big_gen_rand(&a, NON_NEGATIVE, 2);
 		} while (big_is_one(a) || big_is_zero(a));
 
 		// checking gcd(a, p) = 1
@@ -216,7 +211,7 @@ static bool big_isPrime(bigint* p)
 		big_mod_exp(&a, a, divisionByTwo, p);
 		if (big_is_one(a))
 		{
-			flag = true;
+			probablyPrime = true;
 			continue;
 		}
 
@@ -230,14 +225,14 @@ static bool big_isPrime(bigint* p)
 			big_mod(&tmp, tmp, p);
 			// tmp = 0 => a = -1 (mod p) => p is composite
 			if (big_is_zero(tmp)) {
-				flag = true;
+				probablyPrime = true;
 				break; 
 			}
 			big_squaring(&a, a);
 			big_mod(&a, a, p);
 		}
 		big_delete(&tmp);
-		if (flag)
+		if (probablyPrime)
 			continue;
 		isPrime = false;
 	}

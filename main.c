@@ -77,31 +77,56 @@ int main()
 //	big_delete(&c);
 //	big_delete(&n);
 
+	int testCase = 5;
+	int msglen = 1;
 	bigint* publicKey = NULL;
 	bigint* privateKey = NULL;
 	bigint* plainText = NULL;
 	bigint* cipherText = NULL;
 	bigint* decCipherText = NULL;
 
+	clock_t key_gen_start = clock();
 	big_RSA_key_gen(&publicKey, &privateKey);
+	clock_t key_gen_end = clock();
+	float key_gen_time = (float)(key_gen_end - key_gen_start) / CLOCKS_PER_SEC;
+	printf("Key generation time : %.5f\n", key_gen_time);
+
 	printf("public key = ");
 	big_show_hex(publicKey);
 	printf("\n");
 	printf("private key = ");
 	big_show_hex(privateKey);
 	printf("\n");
-	big_gen_rand(&plainText, NON_NEGATIVE, 5);
-	printf("message = ");
-	big_show_hex(plainText);
-	printf("\n");
-	big_RSA_encryption(&cipherText, plainText, publicKey);
-	printf("cipher = ");
-	big_show_hex(cipherText);
-	printf("\n");
-	big_RSA_decryption(&decCipherText, cipherText, publicKey, privateKey);
-	printf("decipher = ");
-	big_show_hex(decCipherText);
-	printf("\n");
+
+	for (int i = 0; i < testCase; i++) {
+		printf("Test %d\n\n", i + 1);
+		// gen msg
+		msglen = rand() % publicKey->wordlen;
+		if (msglen == 0)
+			msglen = 1;
+		big_gen_rand(&plainText, NON_NEGATIVE, msglen);
+		printf("message = ");
+		big_show_hex(plainText);
+		printf("\n");
+
+		// encryption
+		big_RSA_encryption(&cipherText, plainText, publicKey);
+		printf("cipher = ");
+		big_show_hex(cipherText);
+		printf("\n");
+
+		// decryption
+		big_RSA_decryption(&decCipherText, cipherText, publicKey, privateKey);
+		printf("decipher = ");
+		big_show_hex(decCipherText);
+		printf("\n");
+
+		// check msg == decipher
+		if (big_compare(plainText, decCipherText) == EQUAL)
+			printf("message == decipher\n");
+		printf("\n");
+
+	}
 
 	big_delete(&publicKey);
 	big_delete(&privateKey);
