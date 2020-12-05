@@ -152,6 +152,7 @@
     <ClCompile Include="ErrorMessage.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="RSA.c" />
+    <ClCompile Include="test.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BasicOperation.h" />
@@ -160,6 +161,7 @@
     <ClInclude Include="CoreOperation.h" />
     <ClInclude Include="ErrorMessage.h" />
     <ClInclude Include="RSA.h" />
+    <ClInclude Include="test.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

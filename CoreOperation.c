@@ -1851,7 +1851,7 @@ ErrorMessage big_mod_exp(bigint** z, bigint* x, bigint* n, bigint* y)
 		absX->sign = NON_NEGATIVE;
 		big_mod_expABS(&tmp, absX, n, y);
 		if (big_is_odd(n))
-			tmp->sign = NEGATIVE;
+			big_substraction(&tmp, y, tmp);
 		big_delete(&absX);
 	}
 
