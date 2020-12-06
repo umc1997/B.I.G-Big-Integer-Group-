@@ -10,35 +10,19 @@ int main()
 	srand((unsigned)time(NULL));
 	
 	//Answer Test
-	//printf("print(\"%d-bit Test\")\n", WORD_UNIT);
+	/*printf("print(\"%d-bit Test\")\n", WORD_UNIT);
 
-	//additionTest();
-	//subtractionTest();
-	//multiplicationTest();
-	//squaringTest();
-	//divisionTest();
-	//mod_expTest();
+	additionTest();
+	subtractionTest();
+	multiplicationTest();
+	squaringTest();
+	divisionTest();
+	mod_expTest();*/
 	
-	//Time Test
-	
-	//for (int i = 0; i < 5; i++)
-	//	additionTimeTest();
-	//printf("\n");
-	//for (int i = 0; i < 5; i++)
-	//	subtractionTimeTest();
-	//printf("\n");
-	/*for (int i = 0; i < 5; i++)
-		multiplicationTimeTest();
-	printf("\n");
-	for (int i = 0; i < 5; i++)
-		squaringTimeTest();
-	printf("\n");*/
-	/*for (int i = 0; i < 5; i++)
-		divisionTimeTest();
-	printf("\n");
-	*/
-	//mod_expTimeTest();
-
+	//decimalTest();
+	//gcdTest();
+	//modular_inverseTest();
+	//primeTest();
 	RSATest();
 	
 	return 0;

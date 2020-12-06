@@ -20,6 +20,7 @@ void RSATest();
 void decimalTest();
 void gcdTest();
 void modular_inverseTest();
+void primeTest();
 
 void additionTimeTest();
 void subtractionTimeTest();

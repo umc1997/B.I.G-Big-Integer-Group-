@@ -506,17 +506,24 @@ void decimalTest()
 {
 	char decimal[1000];
 	bigint* a = NULL;
-	printf("Enter decimal number (Don't write prefix) : ");
+	bigint* b = NULL;
+	bigint* c = NULL;
+	printf("Enter a decimal integer (Don't write prefix) : ");
 	int tmp = scanf("%s", decimal);
 	big_set_by_string(&a, NON_NEGATIVE, decimal, 10);
 
-	printf("hex : ");
-	big_show_hex(a);
+	printf("Enter the other decimal integer (Don't write prefix) : ");
+	tmp = scanf("%s", decimal);
+	big_set_by_string(&b, NON_NEGATIVE, decimal, 10);
 
-	printf("dec : ");
-	big_show_dec(a);
+	big_addition(&c, a, b);
+
+	printf("The sum of two integers : ");
+	big_show_dec(c);
 
 	big_delete(&a);
+	big_delete(&b);
+	big_delete(&c);
 }
 void gcdTest()
 {
@@ -591,6 +598,20 @@ void modular_inverseTest()
 	big_delete(&a);
 	big_delete(&b);
 	big_delete(&c);
+}
+void primeTest()
+{
+	bigint* p = NULL;
+	int wordlen = RSA_BIT / WORD_UNIT;
+
+	for (int i = 0; i < 5; i++)
+	{
+		big_gen_secure_prime(&p);
+		printf("p = ");
+		big_show_hex(p);
+	}
+
+	big_delete(&p);
 }
 
 void additionTimeTest()

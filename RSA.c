@@ -4,7 +4,6 @@
 #define PRIME_LIST_NUM 53
 
 /* prototype */
-static ErrorMessage big_gen_secure_prime(bigint** p);
 static bool big_isPrime(bigint* p);
 static bool big_isSecurePrime(bigint* p);
 static ErrorMessage big_gen_nbit_prime(bigint** p);
@@ -117,8 +116,13 @@ ErrorMessage big_RSA_decipher(bigint** plainText, bigint* cipherText, bigint* pu
 	return SUCCESS;
 }
 
-//static function
-static ErrorMessage big_gen_secure_prime(bigint** p)
+/**
+ * Generate secure prime.
+ * 
+ * \param p : address of prime to generate
+ * \return : ErrorMessage
+ */
+ErrorMessage big_gen_secure_prime(bigint** p)
 {
 	bigint* tmp = NULL;
 	do
