@@ -40,6 +40,21 @@ void showProcessModExp(bigint* c, bigint* a, bigint* n, bigint* b)
 	printf("\tprint(hex(pow(a, n, b))) \n");
 	printf("\tprint(hex(c)) \n");
 }
+void show_hex_without_prefix(bigint* x)
+{
+	int wordlen = x->wordlen;
+	for (int i = wordlen - 1; i >= 0; i--)
+	{
+#if WORD_UNIT==8
+		printf("%02x", x->a[i]);
+#elif WORD_UNIT==32
+		printf("%08x", x->a[i]);
+#elif WORD_UNIT==64
+		printf("%016llx", x->a[i]);
+#endif
+	}
+	printf("\n");
+}
 
 void additionTest()
 {
@@ -414,54 +429,168 @@ void RSATest()
 	bigint* cipherText = NULL;
 	bigint* decCipherText = NULL;
 
-	clock_t key_gen_start = clock();
-	big_RSA_key_gen(&publicKey, &privateKey);
-	clock_t key_gen_end = clock();
-	float key_gen_time = (float)(key_gen_end - key_gen_start) / CLOCKS_PER_SEC;
-	printf("Key generation time : %.5f\n", key_gen_time);
+	//clock_t key_gen_start = clock();
+	//big_RSA_key_gen(&publicKey, &privateKey);
+	//clock_t key_gen_end = clock();
+	//float key_gen_time = (float)(key_gen_end - key_gen_start) / CLOCKS_PER_SEC;
+	//printf("Key generation time : %.5f\n", key_gen_time);
+	int command = 0;
+	while (1)
+	{
+		printf("0. Exit\n");
+		printf("1. Key Generate\n");
+		printf("2. Encipher\n");
+		printf("3. Decipher\n");
+		printf("Enter the command : ");
+		int a = scanf("%d", &command);
+		if (command == 0) break;
+		else if (command == 1)
+		{
+			big_RSA_key_gen(&publicKey, &privateKey);
+			printf("public key : ");
+			show_hex_without_prefix(publicKey);
+			printf("\n");
+			printf("private key : ");
+			show_hex_without_prefix(privateKey);
+			printf("\n");
+		}
+		else if (command == 2)
+		{
+			char msg[RSA_BIT / sizeof(char)];
+			char pubKey[RSA_BIT / sizeof(char)];
 
-	printf("public key = ");
-	big_show_hex(publicKey);
-	printf("\n");
-	printf("private key = ");
-	big_show_hex(privateKey);
-	printf("\n");
+			printf("Enter message : ");
+			a = scanf("%s", msg);
+			big_set_by_string(&plainText, NON_NEGATIVE, msg, 16);
+			printf("\n");
 
-	for (int i = 0; i < 10; i++) {
-		printf("Test %d\n\n", i + 1);
-		// gen msg
-		msglen = rand() % publicKey->wordlen;
-		if (msglen == 0)
-			msglen = 1;
-		big_gen_rand(&plainText, NON_NEGATIVE, msglen);
-		printf("message = ");
-		big_show_hex(plainText);
+			printf("Enter public key (Don't write prefix) : ");
+			a = scanf("%s", pubKey);
+			big_set_by_string(&publicKey, NON_NEGATIVE, pubKey, 16);
+			big_RSA_encipher(&cipherText, plainText, publicKey);
+			printf("\n");
+
+			printf("Cipher text : ");
+			show_hex_without_prefix(cipherText);
+		}
+		else if (command == 3)
+		{
+			char msg[RSA_BIT / sizeof(char)];
+			char pubKey[RSA_BIT / sizeof(char)];
+			char priKey[RSA_BIT / sizeof(char)];
+			printf("Enter message : ");
+			a = scanf("%s", msg);
+			printf("\n");
+			printf("Enter public key (Don't write prefix) : ");
+			a = scanf("%s", pubKey);
+			big_set_by_string(&publicKey, NON_NEGATIVE, pubKey, 16);
+			printf("\n");
+			printf("Enter private key (Don't write prefix) : ");
+			a = scanf("%s", priKey);
+			big_set_by_string(&privateKey, NON_NEGATIVE, priKey, 16);
+
+			big_RSA_decipher(&decCipherText, cipherText, publicKey, privateKey);
+			printf("\n");
+			printf("Original message : ");
+			show_hex_without_prefix(decCipherText);
+		}
 		printf("\n");
-
-		// encryption
-		big_RSA_encipher(&cipherText, plainText, publicKey);
-		printf("cipher = ");
-		big_show_hex(cipherText);
-		printf("\n");
-
-		// decryption
-		big_RSA_decipher(&decCipherText, cipherText, publicKey, privateKey);
-		printf("decipher = ");
-		big_show_hex(decCipherText);
-		printf("\n");
-
-		// check msg == decipher
-		if (big_compare(plainText, decCipherText) == EQUAL)
-			printf("message == decipher\n");
-		printf("\n");
-
 	}
-
 	big_delete(&publicKey);
 	big_delete(&privateKey);
 	big_delete(&plainText);
 	big_delete(&cipherText);
 	big_delete(&decCipherText);
+}
+void decimalTest()
+{
+	char decimal[1000];
+	bigint* a = NULL;
+	printf("Enter decimal number (Don't write prefix) : ");
+	int tmp = scanf("%s", decimal);
+	big_set_by_string(&a, NON_NEGATIVE, decimal, 10);
+
+	printf("hex : ");
+	big_show_hex(a);
+
+	printf("dec : ");
+	big_show_dec(a);
+
+	big_delete(&a);
+}
+void gcdTest()
+{
+	bigint* a = NULL;
+	bigint* b = NULL;
+	bigint* c = NULL;
+	int wordlen = testBitlen / WORD_UNIT;
+
+	printf("print(\"GCD Test\")\n");
+	printf("from math import gcd\n");
+	printf("flag = 1\n");
+	for (int i = 0; i < testCase; i++)
+	{
+		int aWordlen = rand() % wordlen + 1;
+		int bWordlen = rand() % wordlen + 1;
+		big_gen_rand(&a, NON_NEGATIVE, aWordlen);
+		big_gen_rand(&b, NON_NEGATIVE, bWordlen);
+		big_gcd(&c, a, b);
+		printf("a = ");
+		big_show_hex(a);
+		printf("b = ");
+		big_show_hex(b);
+		printf("c = ");
+		big_show_hex(c);
+		printf("if gcd(a, b) != c :\n");
+		printf("\tflag = 0 \n");
+		printf("\tprint(hex(c)) \n");
+	}
+	printf("if flag :\n");
+	printf("\tprint(\"GCD Test Passed\")\n");
+	printf("else:\n");
+	printf("\tprint(\"GCD Test Failed\")\n");
+
+	big_delete(&a);
+	big_delete(&b);
+	big_delete(&c);
+}
+void modular_inverseTest()
+{
+	bigint* a = NULL;
+	bigint* b = NULL;
+	bigint* c = NULL;
+	int wordlen = testBitlen / WORD_UNIT;
+	printf("print(\"Inverse Test\")\n");
+	printf("flag = 1\n");
+
+	big_set_by_string(&b, NON_NEGATIVE, "97", 10);
+	for (int i = 0; i < testCase; i++)
+	{
+		int aWordlen = 1;
+		do {
+			big_gen_rand(&a, NON_NEGATIVE, aWordlen);
+		} while (!big_is_relatively_prime(a, b));
+		big_mod_inverse(&c, a, b);
+		printf("a = ");
+		big_show_hex(a);
+		printf("b = ");
+		big_show_hex(b);
+		printf("c = ");
+		big_show_hex(c);
+		printf("if a * c %% b != 1 :\n");
+		printf("\tflag = 0 \n");
+		printf("\tprint(hex(a)) \n");
+		printf("\tprint(hex(c)) \n");
+	}
+
+	printf("if flag :\n");
+	printf("\tprint(\"Inverse Test Passed\")\n");
+	printf("else:\n");
+	printf("\tprint(\"Inverse Test Failed\")\n");
+
+	big_delete(&a);
+	big_delete(&b);
+	big_delete(&c);
 }
 
 void additionTimeTest()
@@ -561,7 +690,7 @@ void divisionTimeTest()
 	bigint* r = NULL;
 	int wordlen = testBitlen / WORD_UNIT;
 	big_gen_rand(&a, NON_NEGATIVE, wordlen * 2);
-	big_gen_rand(&a, NON_NEGATIVE, wordlen);
+	big_gen_rand(&b, NON_NEGATIVE, wordlen);
 	clock_t start = clock();
 	for (int i = 0; i < testCase; i++)
 	{
@@ -577,6 +706,29 @@ void divisionTimeTest()
 	big_delete(&b);
 	big_delete(&q);
 	big_delete(&r);
+}
+void modTimeTest()
+{
+	bigint* a = NULL;
+	bigint* b = NULL;
+	bigint* c = NULL;
+	int wordlen = testBitlen / WORD_UNIT;
+	big_gen_rand(&a, NON_NEGATIVE, wordlen * 2);
+	big_gen_rand(&b, NON_NEGATIVE, wordlen);
+	clock_t start = clock();
+	for (int i = 0; i < testCase; i++)
+	{
+		big_mod(&c, a, b);
+	}
+	clock_t end = clock();
+	float dif = (float)(end - start) / CLOCKS_PER_SEC;
+	dif /= testCase;
+	dif *= 10000;
+	printf("%.5f\n", dif);
+
+	big_delete(&a);
+	big_delete(&b);
+	big_delete(&c);
 }
 void mod_expTimeTest()
 {

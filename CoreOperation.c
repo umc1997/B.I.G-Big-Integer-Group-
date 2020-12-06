@@ -1213,7 +1213,11 @@ static ErrorMessage big_multiplicationABS(bigint** z, bigint* x, bigint* y)
 	int newWordlen = x->wordlen + y->wordlen;
 	big_new(z, NON_NEGATIVE, newWordlen);
 
+#if karatsuba
 	big_multiplicationKaratsuba(z, x, y);
+#else
+	big_multiplicationSchoolBook(z, x, y);
+#endif
 
 	big_refine(*z);
 	return SUCCESS;
@@ -1435,7 +1439,11 @@ static ErrorMessage big_squaringABS(bigint** z, bigint* x)
 
 	big_new(z, NON_NEGATIVE, newWordlen);
 
+#if karatsuba
 	big_squaringKaratsuba(z, x);
+#else
+	big_squaringSchoolBook(z, x);
+#endif
 
 	big_refine(*z);
 	return SUCCESS;

@@ -7,7 +7,7 @@
 #include "RSA.h"
 #include "BigInt.h"
 
-#define testBitlen 2048
+#define testBitlen 1024
 #define testCase 1000
 
 void additionTest();
@@ -17,12 +17,16 @@ void squaringTest();
 void divisionTest();
 void mod_expTest();
 void RSATest();
+void decimalTest();
+void gcdTest();
+void modular_inverseTest();
 
 void additionTimeTest();
 void substractionTimeTest();
 void multiplicationTimeTest();
 void squaringTimeTest();
 void divisionTimeTest();
+void modTimeTest();
 void mod_expTimeTest();
 
 #endif
