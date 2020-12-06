@@ -599,18 +599,19 @@ void additionTimeTest()
 	bigint* b = NULL;
 	bigint* c = NULL;
 	int wordlen = testBitlen / WORD_UNIT;
+	int t = testCase * 10;
 	big_gen_rand(&a, NON_NEGATIVE, wordlen);
 	big_gen_rand(&b, NON_NEGATIVE, wordlen);
 	clock_t start = clock();
-	for (int i = 0; i < testCase; i++)
+	for (int i = 0; i < t; i++)
 	{
 		big_addition(&c, a, b);
 	}
 	clock_t end = clock();
-	float dif = (float)(end - start) / CLOCKS_PER_SEC;
-	dif /= testCase;
+	float dif = (float)(end - start)/ CLOCKS_PER_SEC;
+	dif /= t;
 	dif *= 10000;
-	printf("%.10f\n", dif);
+	printf("%.5lf\n", dif);
 
 	big_delete(&a);
 	big_delete(&b);
@@ -622,16 +623,17 @@ void substractionTimeTest()
 	bigint* b = NULL;
 	bigint* c = NULL;
 	int wordlen = testBitlen / WORD_UNIT;
+	int t = testCase * 10;
 	big_gen_rand(&a, NON_NEGATIVE, wordlen);
 	big_gen_rand(&b, NON_NEGATIVE, wordlen);
 	clock_t start = clock();
-	for (int i = 0; i < testCase; i++)
+	for (int i = 0; i < t; i++)
 	{
 		big_substraction(&c, a, b);
 	}
 	clock_t end = clock();
 	float dif = (float)(end - start) / CLOCKS_PER_SEC;
-	dif /= testCase;
+	dif /= t;
 	dif *= 10000;
 	printf("%.5f\n", dif);
 
@@ -692,13 +694,13 @@ void divisionTimeTest()
 	big_gen_rand(&a, NON_NEGATIVE, wordlen * 2);
 	big_gen_rand(&b, NON_NEGATIVE, wordlen);
 	clock_t start = clock();
-	for (int i = 0; i < testCase; i++)
+	for (int i = 0; i < 10; i++)
 	{
 		big_division(&q, &r, a, b);
 	}
 	clock_t end = clock();
 	float dif = (float)(end - start) / CLOCKS_PER_SEC;
-	dif /= testCase;
+	dif /= 10;
 	dif *= 10000;
 	printf("%.5f\n", dif);
 

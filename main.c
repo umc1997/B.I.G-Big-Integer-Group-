@@ -12,24 +12,34 @@ int main()
 	//Answer Test
 	//printf("print(\"%d-bit Test\")\n", WORD_UNIT);
 
-	/*additionTest();
-	substractionTest();
-	multiplicationTest();
-	squaringTest();
-	divisionTest();
-	mod_expTest();*/
+	//additionTest();
+	//substractionTest();
+	//multiplicationTest();
+	//squaringTest();
+	//divisionTest();
+	//mod_expTest();
 	
-
-	/*
 	//Time Test
+	
+	//for (int i = 0; i < 5; i++)
+	//	additionTimeTest();
+	//printf("\n");
+	//for (int i = 0; i < 5; i++)
+	//	substractionTimeTest();
+	//printf("\n");
+	/*for (int i = 0; i < 5; i++)
+		multiplicationTimeTest();
+	printf("\n");
+	for (int i = 0; i < 5; i++)
+		squaringTimeTest();
+	printf("\n");*/
+	/*for (int i = 0; i < 5; i++)
+		divisionTimeTest();
+	printf("\n");
 	*/
-	//multiplicationTimeTest();
-	//squaringTimeTest();
-	//divisionTimeTest();
-	//modTimeTest();
 	//mod_expTimeTest();
 
-	//RSATest();
+	RSATest();
 	
 	return 0;
 }
