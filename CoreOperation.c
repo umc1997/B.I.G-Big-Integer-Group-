@@ -619,8 +619,6 @@ ErrorMessage big_bit_left_shift(bigint** dst, bigint* src, int count) {
 		big_assign(dst, src);
 		return SUCCESS;
 	}
-	bigint* tmp = NULL;
-
 	// count = quotient * WORD_UNIT + remainder
 	int remainder = count % WORD_UNIT;
 	int quotient = (count - remainder);
@@ -642,6 +640,7 @@ ErrorMessage big_bit_left_shift(bigint** dst, bigint* src, int count) {
 	else
 		newWordlen += 1;
 
+	bigint* tmp = NULL;
 	big_new(&tmp, src->sign, newWordlen);
 	for (int i = 0; i < newWordlen; i++)
 	{
@@ -682,8 +681,7 @@ ErrorMessage big_bit_right_shift(bigint** dst, bigint* src, int count) {
 		big_assign(dst, src);
 		return SUCCESS;
 	}
-	bigint* tmp = NULL;
-
+	
 	// count = quotient * WORD_UNIT + remainder
 	int remainder = count % WORD_UNIT;
 	int quotient = (count - remainder);
@@ -703,6 +701,7 @@ ErrorMessage big_bit_right_shift(bigint** dst, bigint* src, int count) {
 		return SUCCESS;
 	}
 
+	bigint* tmp = NULL;
 	big_new(&tmp, src->sign, newWordlen);
 
 	for (int i = 0; i < newWordlen; i++)
@@ -1362,40 +1361,13 @@ ErrorMessage big_multiplicationConst(bigint** z, bigint* x, word y)
 {
 	if (x == NULL)
 		return FAIL_NULL;
-	word constant = y;
+	word constant[1] = { y };
 	//alloc
 	bigint* tmp = NULL;
-	big_assign(&tmp, x);
-	if (constant == 0)
-	{
-		big_set_zero(&tmp);
-	}
-	else
-	{
-		bigint* tmp2 = NULL;
-		big_set_zero(&tmp2);
-		while (constant != 1)
-		{
-			// if constant = c' * 2
-			// x * constant = 2x * c' = bit_left_shift(x) * c'
-			if (constant % 2 == 0)
-			{
-				big_bit_left_shift(&tmp, tmp, 1);
-			}
-			// if constant = c' * 2 + 1
-			// x * constant = 2x * c' + x  = bit_left_shift(x) * c' + x
-			else
-			{
-				big_addition(&tmp2, tmp, tmp2);
-				big_bit_left_shift(&tmp, tmp, 1);
-			}
-			// constant <- c'
-			constant /= 2;
-		}
-		big_addition(&tmp, tmp, tmp2);
-		big_delete(&tmp2);
-	}
-	big_assign(z, tmp);
+	big_set_by_array(&tmp, NON_NEGATIVE, constant, 1);
+
+	big_multiplication(z, x, tmp);
+	
 	big_delete(&tmp);
 	return SUCCESS;
 }

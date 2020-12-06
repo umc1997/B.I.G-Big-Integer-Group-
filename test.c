@@ -398,7 +398,7 @@ void mod_expTest()
 	showProcessModExp(c, a, n, b);
 
 	// test 4 : random bigint test
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 100; i++)
 	{
 		int aSign = rand() % 2;
 		int aWordlen = rand() % wordlen + 1;

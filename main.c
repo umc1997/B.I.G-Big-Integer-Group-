@@ -23,11 +23,11 @@ int main()
 	/*
 	//Time Test
 	*/
-	multiplicationTimeTest();
-	squaringTimeTest();
-	divisionTimeTest();
+	//multiplicationTimeTest();
+	//squaringTimeTest();
+	//divisionTimeTest();
 	//modTimeTest();
-	//mod_expTimeTest();
+	mod_expTimeTest();
 
 	//RSATest();
 	
