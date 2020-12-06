@@ -183,7 +183,6 @@ ErrorMessage big_set_by_string(bigint** x, int sign, char* str, int base) {
 ErrorMessage big_show_hex(bigint* x) {
 	if (x == NULL)
 		return FAIL_NULL;
-	big_refine(x);
 	int wordlen = x->wordlen;
 	if (x->sign == NEGATIVE)
 		printf("-");
@@ -211,7 +210,6 @@ ErrorMessage big_show_dec(bigint* x)
 {
 	if (x == NULL)
 		return FAIL_NULL;
-	big_refine(x);
 	int wordlen = x->wordlen;
 	bigint* tmpX = NULL;
 	bigint* ten = NULL;
@@ -265,7 +263,6 @@ ErrorMessage big_show_dec(bigint* x)
 ErrorMessage big_show_bin(bigint* x) {
 	if (x == NULL)
 		return FAIL_NULL;
-	big_refine(x);
 	int wordlen = x->wordlen;
 	if (x->sign == NEGATIVE)
 		printf("-");
@@ -315,8 +312,6 @@ static ErrorMessage big_refine(bigint* x) {
  */
 ErrorMessage big_assign(bigint** dst, bigint* src) {
 	if (*dst == src)return SUCCESS;
-	if (*dst != NULL)
-		big_delete(dst);
 	big_new(dst, src->sign, src->wordlen);
 	memcpy((*dst)->a, src->a, sizeof(word) * (src->wordlen));
 	return SUCCESS;
@@ -332,8 +327,9 @@ ErrorMessage big_assign(bigint** dst, bigint* src) {
 ErrorMessage big_gen_rand(bigint** x, int sign, int wordlen)
 {
 	big_new(x, sign, wordlen);
-	array_rand((*x)->a, wordlen);
-	big_refine(*x);
+	do {
+		array_rand((*x)->a, wordlen);
+	} while ((*x)->a[wordlen - 1] == 0);
 	return SUCCESS;
 }
 /**
@@ -450,7 +446,6 @@ ErrorMessage big_set_one(bigint** x) {
 bool big_is_zero(bigint* x) {
 	if (x == NULL)
 		return FAIL_NULL;
-	big_refine(x);
 	return (x->sign == NON_NEGATIVE) && (x->wordlen == 1) && (x->a[0] == 0x0);
 }
 /**
@@ -462,7 +457,6 @@ bool big_is_zero(bigint* x) {
 bool big_is_one(bigint* x) {
 	if (x == NULL)
 		return FAIL_NULL;
-	big_refine(x);
 	return (x->sign == NON_NEGATIVE) && (x->wordlen == 1) && (x->a[0] == 0x1);
 }
 /**
@@ -475,9 +469,7 @@ bool big_is_minus_one(bigint* x)
 {
 	if (x == NULL)
 		return FAIL_NULL;
-	big_refine(x);
 	return (x->sign == NEGATIVE) && (x->wordlen == 1) && (x->a[0] == 0x1);
-
 }
 /**
  * return if the bigint is odd or not.
@@ -489,7 +481,6 @@ bool big_is_odd(bigint* x)
 {
 	if (x == NULL)
 		return FAIL_NULL;
-	big_refine(x);
 	return ((x->a[0]) & 0x1);
 }
 /**
@@ -502,7 +493,6 @@ bool big_is_even(bigint* x)
 {
 	if (x == NULL)
 		return FAIL_NULL;
-	big_refine(x);
 	return !((x->a[0]) & 0x1);
 }
 /**
@@ -533,8 +523,6 @@ bool big_is_relatively_prime(bigint* x, bigint* y)
 int big_compare(bigint* x, bigint* y) {
 	if (x == NULL || y == NULL)
 		return FAIL_NULL;
-	big_refine(x);
-	big_refine(y);
 	int xSign = x->sign;
 	int ySign = y->sign;
 	// 1. if both signs are same -> compareABS
@@ -904,8 +892,6 @@ ErrorMessage big_addition(bigint** z, bigint* x, bigint* y)
 	// alloc
 	bigint* tmp = NULL;
 
-	big_refine(x);
-	big_refine(y);
 	// x = 0 -> x + y = y
 	if (big_is_zero(x))
 		big_assign(&tmp, y);
@@ -1010,9 +996,6 @@ ErrorMessage big_substraction(bigint** z, bigint* x, bigint* y)
 		return FAIL_NULL;
 	//alloc
 	bigint* tmp = NULL;
-
-	big_refine(x);
-	big_refine(y);
 
 	int comp = big_compare(x, y);
 	// x = 0 -> x - y = -y
@@ -1132,8 +1115,6 @@ ErrorMessage big_multiplication(bigint** z, bigint* x, bigint* y)
 	// alloc
 	bigint* tmp = NULL;
 
-	big_refine(x);
-	big_refine(y);
 	// x = 0 or y = 0  -> x * y = 0
 	if (big_is_zero(x) || big_is_zero(y))
 		big_set_zero(&tmp);
@@ -1255,8 +1236,6 @@ static ErrorMessage big_multiplicationSchoolBook(bigint** z, bigint* x, bigint* 
 		big_addition(z, *z, T0);
 		big_addition(z, *z, T1);
 	}
-	big_refine(*z);
-
 	big_delete(&T0);
 	big_delete(&T1);
 
@@ -1316,7 +1295,6 @@ static ErrorMessage big_multiplicationKaratsuba(bigint** z, bigint* x, bigint* y
 				R->a[i] = T1->a[i - 2 * l];
 			}
 		}
-		big_refine(R);
 
 		// S1 = A0 - A1, S0 = B1 - B0
 		big_substraction(&S1, A0, A1);
@@ -1385,7 +1363,6 @@ ErrorMessage big_squaring(bigint** z, bigint* x)
 		return FAIL_NULL;
 	// alloc
 	bigint* tmp = NULL;
-	big_refine(x);
 
 	if (big_is_zero(x))
 		big_set_zero(&tmp);
@@ -1468,7 +1445,7 @@ static ErrorMessage big_squaringSchoolBook(bigint** z, bigint* x)
 	// C2 = C2 << 1
 	big_bit_left_shift(&C2, C2, 1);
 
-	big_addition(z, C1, C2);
+	big_additionABS(z, C1, C2);
 
 	big_delete(&C1);
 	big_delete(&C2);
@@ -1522,7 +1499,6 @@ static ErrorMessage big_squaringKaratsuba(bigint** z, bigint* x)
 				R->a[i] = T1->a[i - 2 * l];
 			}
 		}
-		big_refine(R);
 
 		// S = (A1 * A0) << (lw + 1)
 		big_multiplicationKaratsuba(&S, A1, A0);
@@ -1530,7 +1506,7 @@ static ErrorMessage big_squaringKaratsuba(bigint** z, bigint* x)
 		big_bit_left_shift(&S, S, 1);
 
 		// R = R + S
-		big_addition(z, R, S);
+		big_additionABS(z, R, S);
 
 		//delete
 		big_delete(&A1);
@@ -1562,9 +1538,6 @@ ErrorMessage big_division(bigint** q, bigint** r, bigint* x, bigint* y)
 	// alloc
 	bigint* tmpQ = NULL;
 	bigint* tmpR = NULL;
-
-	big_refine(x);
-	big_refine(y);
 
 	// if x < y -> x / y = 0 ... x
 	if (big_compare(x, y) == SMALLER)
@@ -1720,8 +1693,6 @@ ErrorMessage big_mod(bigint** z, bigint* x, bigint* y)
 {
 	if (x == NULL || y == NULL)
 		return FAIL_NULL;
-	big_refine(x);
-	big_refine(y);
 	// don't define y <= 0 
 	if (y->sign == NEGATIVE || big_is_zero(y))
 		return FAIL_INVALID_DIVISOR;
@@ -1772,8 +1743,6 @@ ErrorMessage big_mod_inverse(bigint** z, bigint* x, bigint* y)
 {
 	if (x == NULL || y == NULL)
 		return FAIL_NULL;
-	big_refine(x);
-	big_refine(y);
 	// don't define y <= 0 
 	if (y->sign == NEGATIVE || big_is_zero(y))
 		return FAIL_INVALID_DIVISOR;
@@ -1969,8 +1938,6 @@ ErrorMessage big_gcd(bigint** z, bigint* x, bigint* y)
 {
 	if (x == NULL || y == NULL)
 		return FAIL_NULL;
-	big_refine(x);
-	big_refine(y);
 	if (x->sign == NEGATIVE || y->sign == NEGATIVE)
 		return FAIL_INVALID_INPUT;
 	bigint* tmp = NULL;
@@ -2015,8 +1982,6 @@ ErrorMessage big_xgcd(bigint** d, bigint** x, bigint** y, bigint* a, bigint* b)
 {
 	if (a == NULL || b == NULL)
 		return FAIL_NULL;
-	big_refine(a);
-	big_refine(b);
 	if (a->sign == NEGATIVE || b->sign == NEGATIVE)
 		return FAIL_INVALID_INPUT;
 

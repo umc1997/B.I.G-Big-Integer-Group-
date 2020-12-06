@@ -5,7 +5,7 @@
 
 #define karaFlag 8 //1 ~ 
 
-#define karatsuba 0
+#define karatsuba 1
 
 #define EXPMODMODE 1 // 1 = L2R, 2 = R2L, 3 = MS
 

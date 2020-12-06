@@ -12,12 +12,12 @@ int main()
 	//Answer Test
 	//printf("print(\"%d-bit Test\")\n", WORD_UNIT);
 
-	//additionTest();
-	//substractionTest();
-	//multiplicationTest();
-	//squaringTest();
-	//divisionTest();
-	//mod_expTest();
+	/*additionTest();
+	substractionTest();
+	multiplicationTest();
+	squaringTest();
+	divisionTest();
+	mod_expTest();*/
 	
 
 	/*
@@ -27,7 +27,7 @@ int main()
 	//squaringTimeTest();
 	//divisionTimeTest();
 	//modTimeTest();
-	mod_expTimeTest();
+	//mod_expTimeTest();
 
 	//RSATest();
 	
