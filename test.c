@@ -104,66 +104,66 @@ void additionTest()
 	printf("else:\n");
 	printf("\tprint(\"Addition Test Failed\")\n");
 }
-void substractionTest()
+void subtractionTest()
 {
 	bigint* a = NULL;
 	bigint* b = NULL;
 	bigint* c = NULL;
 	int wordlen = testBitlen / WORD_UNIT;
 
-	printf("print(\"Substraction Test\")\n");
+	printf("print(\"Subtraction Test\")\n");
 	printf("flag = 1\n");
 	// c = a - b
 	// test 1 : a = 0
 	big_set_zero(&a);
 	big_gen_rand(&b, NON_NEGATIVE, wordlen);
-	big_substraction(&c, a, b);
+	big_subtraction(&c, a, b);
 	showProcess(c, a, b, '-');
 
 	// test 2 : b = 0
 	big_gen_rand(&a, NON_NEGATIVE, wordlen);
 	big_set_zero(&b);
-	big_substraction(&c, a, b);
+	big_subtraction(&c, a, b);
 	showProcess(c, a, b, '-');
 
 	// test 3 : a = b
 	big_gen_rand(&a, NON_NEGATIVE, wordlen);
 	big_assign(&b, a);
-	big_substraction(&c, a, b);
+	big_subtraction(&c, a, b);
 	showProcess(c, a, b, '-');
 
 	// test 4 : sign test
 	//			(a > b > 0)  (b > a > 0)
 	big_gen_rand(&a, NON_NEGATIVE, wordlen);
 	big_gen_rand(&b, NON_NEGATIVE, wordlen - 1);
-	big_substraction(&c, a, b);
+	big_subtraction(&c, a, b);
 	showProcess(c, a, b, '-');
 
 	big_gen_rand(&a, NON_NEGATIVE, wordlen - 1);
 	big_gen_rand(&b, NON_NEGATIVE, wordlen);
-	big_substraction(&c, a, b);
+	big_subtraction(&c, a, b);
 	showProcess(c, a, b, '-');
 
 	//			(0 > a > b) (0 > b > a)
 	big_gen_rand(&a, NEGATIVE, wordlen);
 	big_gen_rand(&b, NEGATIVE, wordlen - 1);
-	big_substraction(&c, a, b);
+	big_subtraction(&c, a, b);
 	showProcess(c, a, b, '-');
 
 	big_gen_rand(&a, NEGATIVE, wordlen - 1);
 	big_gen_rand(&b, NEGATIVE, wordlen);
-	big_substraction(&c, a, b);
+	big_subtraction(&c, a, b);
 	showProcess(c, a, b, '-');
 
 	//			(a > 0 & b < 0) (a < 0 & b > 0)   
 	big_gen_rand(&a, NON_NEGATIVE, wordlen);
 	big_gen_rand(&b, NEGATIVE, wordlen);
-	big_substraction(&c, a, b);
+	big_subtraction(&c, a, b);
 	showProcess(c, a, b, '-');
 
 	big_gen_rand(&a, NEGATIVE, wordlen);
 	big_gen_rand(&b, NON_NEGATIVE, wordlen);
-	big_substraction(&c, a, b);
+	big_subtraction(&c, a, b);
 	showProcess(c, a, b, '-');
 
 	// test 5 : random bigint test
@@ -175,7 +175,7 @@ void substractionTest()
 		int bWordlen = rand() % wordlen + 1;
 		big_gen_rand(&a, aSign, aWordlen);
 		big_gen_rand(&b, bSign, bWordlen);
-		big_substraction(&c, a, b);
+		big_subtraction(&c, a, b);
 		showProcess(c, a, b, '-');
 	}
 
@@ -183,9 +183,9 @@ void substractionTest()
 	big_delete(&b);
 	big_delete(&c);
 	printf("if flag :\n");
-	printf("\tprint(\"Substraction Test Passed\")\n");
+	printf("\tprint(\"Subtraction Test Passed\")\n");
 	printf("else:\n");
-	printf("\tprint(\"Substraction Test Failed\")\n");
+	printf("\tprint(\"Subtraction Test Failed\")\n");
 }
 void multiplicationTest()
 {
@@ -617,7 +617,7 @@ void additionTimeTest()
 	big_delete(&b);
 	big_delete(&c);
 }
-void substractionTimeTest()
+void subtractionTimeTest()
 {
 	bigint* a = NULL;
 	bigint* b = NULL;
@@ -629,7 +629,7 @@ void substractionTimeTest()
 	clock_t start = clock();
 	for (int i = 0; i < t; i++)
 	{
-		big_substraction(&c, a, b);
+		big_subtraction(&c, a, b);
 	}
 	clock_t end = clock();
 	float dif = (float)(end - start) / CLOCKS_PER_SEC;

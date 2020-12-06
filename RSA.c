@@ -215,7 +215,7 @@ static bool big_isPrime(bigint* p)
 	int maxDivisionByTwo = 0; // l
 	bigint* divisionByTwo = NULL;// q
 	bigint* Pminus1 = NULL;
-	big_substraction(&Pminus1, p, one);
+	big_subtraction(&Pminus1, p, one);
 	big_assign(&divisionByTwo, Pminus1);
 	while (big_is_even(divisionByTwo))
 	{

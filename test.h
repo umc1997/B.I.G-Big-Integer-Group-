@@ -11,7 +11,7 @@
 #define testCase 1000
 
 void additionTest();
-void substractionTest();
+void subtractionTest();
 void multiplicationTest();
 void squaringTest();
 void divisionTest();
@@ -22,7 +22,7 @@ void gcdTest();
 void modular_inverseTest();
 
 void additionTimeTest();
-void substractionTimeTest();
+void subtractionTimeTest();
 void multiplicationTimeTest();
 void squaringTimeTest();
 void divisionTimeTest();

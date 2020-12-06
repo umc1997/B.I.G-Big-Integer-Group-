@@ -63,8 +63,8 @@ ErrorMessage big_word_reduction(bigint** dst, bigint* src, int count);
 // addition : z = x + y
 ErrorMessage big_addition(bigint** z, bigint* x, bigint* y);
 
-// substraction : z = x - y
-ErrorMessage big_substraction(bigint** z, bigint* x, bigint* y);
+// subtraction : z = x - y
+ErrorMessage big_subtraction(bigint** z, bigint* x, bigint* y);
 
 // multiplication : z = x * y
 ErrorMessage big_multiplication(bigint** z, bigint* x, bigint* y);

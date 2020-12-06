@@ -13,7 +13,7 @@ int main()
 	//printf("print(\"%d-bit Test\")\n", WORD_UNIT);
 
 	//additionTest();
-	//substractionTest();
+	//subtractionTest();
 	//multiplicationTest();
 	//squaringTest();
 	//divisionTest();
@@ -25,7 +25,7 @@ int main()
 	//	additionTimeTest();
 	//printf("\n");
 	//for (int i = 0; i < 5; i++)
-	//	substractionTimeTest();
+	//	subtractionTimeTest();
 	//printf("\n");
 	/*for (int i = 0; i < 5; i++)
 		multiplicationTimeTest();

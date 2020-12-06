@@ -4,7 +4,7 @@
 static int big_compareABS(bigint* x, bigint* y);
 static ErrorMessage big_refine(bigint* x);
 static ErrorMessage big_additionABS(bigint** z, bigint* x, bigint* y);
-static ErrorMessage big_substractionABS(bigint** z, bigint* x, bigint* y);
+static ErrorMessage big_subtractionABS(bigint** z, bigint* x, bigint* y);
 static ErrorMessage big_multiplicationABS(bigint** z, bigint* x, bigint* y);
 static ErrorMessage big_multiplicationSchoolBook(bigint** z, bigint* x, bigint* y);
 static ErrorMessage big_multiplicationKaratsuba(bigint** z, bigint* x, bigint* y);
@@ -908,7 +908,7 @@ ErrorMessage big_addition(bigint** z, bigint* x, bigint* y)
 			bigint* absX = NULL;
 			big_assign(&absX, x);
 			big_flip_sign(&absX);
-			big_substraction(&tmp, y, absX);
+			big_subtraction(&tmp, y, absX);
 			big_delete(&absX);
 		}
 		// x > 0 && y < 0 -> x + y = x - absy
@@ -917,7 +917,7 @@ ErrorMessage big_addition(bigint** z, bigint* x, bigint* y)
 			bigint* absY = NULL;
 			big_assign(&absY, y);
 			big_flip_sign(&absY);
-			big_substraction(&tmp, x, absY);
+			big_subtraction(&tmp, x, absY);
 			big_delete(&absY);
 		}
 		else
@@ -983,14 +983,14 @@ static ErrorMessage big_additionABS(bigint** z, bigint* x, bigint* y)
 	return SUCCESS;
 }
 /**
- * substraction x - y = z.
+ * subtraction x - y = z.
  *
  * \param z : address of bigint z (can be NULL)
  * \param x : one bigint (can't be NULL)
  * \param y : another bigint (can't be NULL)
  * \return : ErrorMessage
  */
-ErrorMessage big_substraction(bigint** z, bigint* x, bigint* y)
+ErrorMessage big_subtraction(bigint** z, bigint* x, bigint* y)
 {
 	if (x == NULL || y == NULL)
 		return FAIL_NULL;
@@ -1034,11 +1034,11 @@ ErrorMessage big_substraction(bigint** z, bigint* x, bigint* y)
 		{
 			// x > y > 0 -> x - y = subAbs(x,y)
 			if (comp == BIGGER)
-				big_substractionABS(&tmp, x, y);
+				big_subtractionABS(&tmp, x, y);
 			// y > x > 0 -> x - y = -subAbs(y,x)
 			else
 			{
-				big_substractionABS(&tmp, y, x);
+				big_subtractionABS(&tmp, y, x);
 				big_flip_sign(&tmp);
 			}
 		}
@@ -1046,11 +1046,11 @@ ErrorMessage big_substraction(bigint** z, bigint* x, bigint* y)
 		{
 			// 0 > x > y -> x - y = (absy) - (absx) = subAbs(y,x)
 			if (comp == BIGGER)
-				big_substractionABS(&tmp, y, x);
+				big_subtractionABS(&tmp, y, x);
 			// 0 > y > x -> x - y = -(-x) + (-y) = - (absx - absy) = -subAbs(x,y)
 			else
 			{
-				big_substractionABS(&tmp, x, y);
+				big_subtractionABS(&tmp, x, y);
 				big_flip_sign(&tmp);
 			}
 		}
@@ -1061,7 +1061,7 @@ ErrorMessage big_substraction(bigint** z, bigint* x, bigint* y)
 	return SUCCESS;
 }
 // static function
-static ErrorMessage big_substractionABS(bigint** z, bigint* x, bigint* y)
+static ErrorMessage big_subtractionABS(bigint** z, bigint* x, bigint* y)
 {
 	word* xWords = x->a;
 	word* yWords = y->a;
@@ -1297,8 +1297,8 @@ static ErrorMessage big_multiplicationKaratsuba(bigint** z, bigint* x, bigint* y
 		}
 
 		// S1 = A0 - A1, S0 = B1 - B0
-		big_substraction(&S1, A0, A1);
-		big_substraction(&S0, B1, B0);
+		big_subtraction(&S1, A0, A1);
+		big_subtraction(&S0, B1, B0);
 
 		// S = S1 * S0
 		bool isNegative = (S1->sign != S0->sign);
@@ -1571,7 +1571,7 @@ ErrorMessage big_division(bigint** q, bigint** r, bigint* x, bigint* y)
 		big_set_one(&one);
 		big_addition(&tmpQ, tmpQ, one);
 		big_flip_sign(&tmpQ);
-		big_substraction(&tmpR, y, tmpR);
+		big_subtraction(&tmpR, y, tmpR);
 		big_delete(&absX);
 		big_delete(&one);
 	}
@@ -1669,7 +1669,7 @@ static ErrorMessage big_divisionCoreCore(word* q, bigint** r, bigint* x, bigint*
 	// R = A - BQ
 	bigint* BQ = NULL;
 	big_multiplicationConst(&BQ, y, *q);
-	big_substraction(r, x, BQ);
+	big_subtraction(r, x, BQ);
 
 	// while R < 0 
 	while ((*r)->sign == NEGATIVE)
@@ -1722,7 +1722,7 @@ ErrorMessage big_mod(bigint** z, bigint* x, bigint* y)
 		big_divisionABS(&tmpQ, &tmpR, absX, y);
 
 		// calculate Q and R,  Q = -Q' - 1, R = B - R'
-		big_substraction(&tmpR, y, tmpR);
+		big_subtraction(&tmpR, y, tmpR);
 		big_delete(&absX);
 	}
 	big_assign(z, tmpR);
@@ -1800,7 +1800,7 @@ ErrorMessage big_mod_exp(bigint** z, bigint* x, bigint* n, bigint* y)
 		absX->sign = NON_NEGATIVE;
 		big_mod_expABS(&tmp, absX, n, y);
 		if (big_is_odd(n))
-			big_substraction(&tmp, y, tmp);
+			big_subtraction(&tmp, y, tmp);
 		big_delete(&absX);
 	}
 
@@ -2030,7 +2030,7 @@ static ErrorMessage big_xgcdRecursive(bigint** d, bigint** x, bigint** y, bigint
 
 		// v = u0 - v0 * (a / b)
 		big_multiplication(&tmpQ, y0, tmpQ);
-		big_substraction(y, x0, tmpQ);
+		big_subtraction(y, x0, tmpQ);
 
 		// del
 		big_delete(&tmpQ);
