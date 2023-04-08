@@ -3,7 +3,9 @@
 The Library for Big Integer. 
 
 Usage:
+
 - Basic Operation
+
 1.Addition
 
 2.Substraction
@@ -21,6 +23,7 @@ Usage:
 8.Extended euclidean algorithm
 
 9.Modular inverse
-
+Cancel changes
 - Extended Usage
+
 1. RSA
