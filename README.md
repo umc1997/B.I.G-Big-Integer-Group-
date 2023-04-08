@@ -1,6 +1,6 @@
 # The Notorious B.I.G-Big-Integer-Group-
 
-The Library for Big Integer. 
+The Library for Big Integer Operation
 
 Usage:
 
