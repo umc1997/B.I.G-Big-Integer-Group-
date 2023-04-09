@@ -1,29 +1,17 @@
 # The Notorious B.I.G-Big-Integer-Group-
 
-The Library for Big Integer Operation
+큰 정수 (Big Integer) 연산을 위한 C++ 라이브러리
 
-Usage:
+용도:
 
-- Basic Operation
+1. 사칙연산 (덧셈, 뺄셈, 곱셈, 나눗셈) 
 
-1.Addition
+2. 나머지 연산 (모듈러 연산)
 
-2.Substraction
+3. 유클리드 알고리즘
 
-3.Multiplication
+4. 확장 유클리드 알고리즘
 
-4.Squaring
+5. 모듈러 역원
 
-5.Division
-
-6.Modular exponentiation	
-
-7.Euclidean algorithm
-
-8.Extended euclidean algorithm
-
-9.Modular inverse
-
-- Extended Usage
-
-1. RSA
++ RSA 암호화
