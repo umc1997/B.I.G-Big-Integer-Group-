@@ -65,46 +65,51 @@ char digit2char(word a)
 }
 unsigned int hex2int(char c)
 {
-	if (c >= 'a' && c <= 'z')
-	{
-		return (int)c - 'a' + 10;
-	}
-	else if (c >= 'A' && c <= 'Z')
-	{
-		return (int)c - 'A' + 10;
-	}
-	else if (c >= '0' && c <= '9')
-	{
-		return (int)c - '0';
-	}
-	else
-	{
-		return 0;
-	}
+        if (c >= 'a' && c <= 'f')
+        {
+                return (unsigned int)c - 'a' + 10;
+        }
+        else if (c >= 'A' && c <= 'F')
+        {
+                return (unsigned int)c - 'A' + 10;
+        }
+        else if (c >= '0' && c <= '9')
+        {
+                return (unsigned int)c - '0';
+        }
+        else
+        {
+                return 0;
+        }
 }
 bool isValidChar(char c, int base)
 {
-	if (base == 2)
-	{
-		if (c != '0' && c != '1')
-			return false;
-	}
-	else if (base == 10)
-	{
-		if (!(c >= '0' && c <= '9'))
-			return false;
-	}
-	else if (base == 16)
-	{
-		if (c >= 'a' && c <= 'z') {}
-		else if (c >= 'A' && c <= 'Z') {}
-		else if (c >= '0' && c <= '9') {}
-		else
-			return false;
-	}
-	else
-		return false;
-	return true;
+        if (base == 2)
+        {
+                if (c != '0' && c != '1')
+                        return false;
+        }
+        else if (base == 10)
+        {
+                if (!(c >= '0' && c <= '9'))
+                        return false;
+        }
+        else if (base == 16)
+        {
+                if ((c >= 'a' && c <= 'f') ||
+                    (c >= 'A' && c <= 'F') ||
+                    (c >= '0' && c <= '9'))
+                {
+                        /* valid hexadecimal character */
+                }
+                else
+                {
+                        return false;
+                }
+        }
+        else
+                return false;
+        return true;
 }
 
 ErrorMessage wordMultiplication(word* C1, word* C0, word A, word B)
