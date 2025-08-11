@@ -1,6 +1,6 @@
 # The Notorious B.I.G-Big-Integer-Group-
 
-큰 정수 (Big Integer) 연산을 위한 C++ 라이브러리
+큰 정수 (Big Integer) 연산을 위한 C 라이브러리
 
 용도:
 
