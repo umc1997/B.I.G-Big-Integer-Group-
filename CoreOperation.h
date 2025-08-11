@@ -46,7 +46,7 @@ ErrorMessage big_assign(bigint** dst, bigint* src);
 // generate random bigint x
 ErrorMessage big_gen_rand(bigint** x, int sign, int wordlen);
 
-// filp sign of bigint x to inverse
+// flip sign of bigint x to inverse
 ErrorMessage big_flip_sign(bigint** x);
 
 // compare x with y (1 = x is bigger, 0 = two numbers are equal, -1 = y is bigger)
