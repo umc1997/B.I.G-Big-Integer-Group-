@@ -402,7 +402,7 @@ int big_get_sign(bigint* x) {
 	return (x->sign);
 }
 /**
- * filp sign of bigint.
+ * flip sign of bigint.
  *
  * \param x : bigint (can't be NULL)
  * \return : ErrorMessage
